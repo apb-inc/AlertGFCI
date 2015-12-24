@@ -1,6 +1,6 @@
 var express = require('express');
 var app = express();
-// var loginInfo = require('./loginInfo.js');
+var loginInfo = require('./loginInfo.js');
 var bodyParser = require('body-parser');
 var nodemailer = require('nodemailer');
 var request = require('request');
@@ -8,7 +8,7 @@ var request = require('request');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-var port = process.env.PORT || 1337;
+var port = process.env.PORT || 31337;
 var router = express.Router();
 // Route settings
 app.use('/', router);
