@@ -18,16 +18,14 @@ app.use(express.static(__dirname + '/public'));
 app.listen(port);
 console.log('Magic happens on port ' + port +" - "+ new Date());
 
-router.get('/', function(req,res){
-    res.type('json');
-    res.send({"status":"200"});
-});
+var healthCheckMins = 30;
+var needToSend = false;
+
 
 setInterval(function(){
-    //This will check if the pi is online every 10 seconds
+    //This will check if the pi is online every x number of minutes
     checkPiHealth();
-
-},10000);
+},5000);
 
 function sendEmail(){
     var currentTime = new Date();
@@ -57,17 +55,22 @@ function sendEmail(){
 
 
 function sendAlert(){
-    //code for nodemailer alert
-    console.log("GFCI has tripped at: "+ new Date());
-    sendEmail();
+
+    if(needToSend){
+        console.log("GFCI has tripped at: "+ new Date());
+        sendEmail();
+        needToSend = false;
+    }
+
 }
 
 function checkPiHealth(){
-    request('127.0.0.1:1337', function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-          //Response is good don't send text
-        } else {
+    request('http://127.0.0.1:1337', function (error, response, body) {
+        if(error && needToSend){
+            console.log("Health Check error"+error);
             sendAlert();
+        } else {
+            needToSend = true;
         }
     });
 }
