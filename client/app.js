@@ -22,3 +22,52 @@ router.get('/', function(req,res){
     res.type('json');
     res.send({"status":"200"});
 });
+
+setInterval(function(){
+    //This will check if the pi is online every 10 seconds
+    checkPiHealth();
+
+},10000);
+
+function sendEmail(){
+    var currentTime = new Date();
+
+    var transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: {
+            user: loginInfo.emailUser,
+            pass: loginInfo.emailPass
+        }
+    });
+
+    var mailOptions = {
+        from: 'Holka Bot <holkafloat+gfciBot@gmail.com>',
+        to: loginInfo.toEmailAddress,
+        subject: 'Floatee update!',
+        text: "The GFCI has tripped! "+currentTime
+    };
+    transporter.sendMail(mailOptions, function(error, info){
+        if(error){
+            return console.log(error);
+        }
+        console.log('Message sent: ' + info.response);
+    });
+}
+
+
+
+function sendAlert(){
+    //code for nodemailer alert
+    console.log("GFCI has tripped at: "+ new Date());
+    sendEmail();
+}
+
+function checkPiHealth(){
+    request('127.0.0.1:1337', function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+          //Response is good don't send text
+        } else {
+            sendAlert();
+        }
+    });
+}
