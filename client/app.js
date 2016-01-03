@@ -74,7 +74,7 @@ function sendAlert(){
 }
 
 function checkPiHealth(){
-    request('http://127.0.0.1:1337', function (error, response, body) {
+    request('http://192.168.1.115:1337', function (error, response, body) {
         if(error){
             logOnline = true;
             sendAlert();
