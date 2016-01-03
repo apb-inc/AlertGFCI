@@ -1,14 +1,16 @@
 var express = require('express');
 var app = express();
-var loginInfo = require('./loginInfo.js');
 var bodyParser = require('body-parser');
 var nodemailer = require('nodemailer');
 var request = require('request');
-// var Gpio = require('onoff').Gpio;
+var Gpio = require('onoff').Gpio;
+var sensor = new Gpio(14, 'in','both');
+var hue = require("node-hue-api");
+
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-var port = process.env.PORT || 31337;
+var port = process.env.PORT || 1338;
 var router = express.Router();
 // Route settings
 app.use('/', router);
@@ -18,73 +20,112 @@ app.use(express.static(__dirname + '/public'));
 app.listen(port);
 console.log('Magic happens on port ' + port +" - "+ new Date());
 
-var healthCheckMins = 30;
-var needToSend = true;
-var logOnline = false;
+var lightsOffTime = new Date();
+var lightTimer = 10;
+
+var HueApi = hue.HueApi;
+var lightState = hue.lightState;
+var curTime;
+
+var hostname = "192.168.1.116",
+    username = "22ae6b2233c8b2971a18523e9343ca3",
+    api;
+
+api = new HueApi(hostname, username);
+
+
+
+sensor.watch(function(err, value) {
+    if (value==1){
+        startHueTimer();       
+    } 
+});
 
 setInterval(function(){
-    //This will check if the pi is online every x number of minutes
-    checkPiHealth();
-},5000);
+	curTime = new Date();
+	if(curTime > lightsOffTime){
+		flipHueOff();
+	}
 
-function sendEmail(type){
-    var currentTime = new Date();
-    var emailContent;
+}, 1*60*1000);
 
 
-    if(type == "online"){
-        emailContent = "The GFCI is back online "+currentTime;
 
-    } else if(type == "offline") {
-        emailContent = "The GFCI has tripped! "+currentTime;
-    }
 
-    var transporter = nodemailer.createTransport({
-        service: 'Gmail',
-        auth: {
-            user: loginInfo.emailUser,
-            pass: loginInfo.emailPass
-        }
-    });
 
-    var mailOptions = {
-        from: 'Holka Bot <holkafloat+gfciBot@gmail.com>',
-        to: loginInfo.toEmailAddress,
-        subject: 'Floatee update!',
-        text: emailContent
-    };
-    transporter.sendMail(mailOptions, function(error, info){
-        if(error){
-            return console.log(error);
-        }
-        //console.log('Message sent: ' + info.response);
-    });
+
+
+router.get('/', function(req,res){
+	start();
+    res.send({"status":"200"});        
+});
+
+
+
+var updateTimer = function(status) {
+		
+	var curTime = new Date();
+	lightsOffTime = new Date(curTime.getTime() + lightTimer*60*1000);		
+	flipHueOn();
+    //console.log(JSON.stringify(status, null, 2));
+};
+
+
+
+
+
+function startHueTimer(){
+	api.lightStatus(1)
+    	.then(updateTimer)
+		.done();
 }
 
 
 
-function sendAlert(){
+/*
 
-    if(needToSend){
-        console.log("GFCI has tripped at: "+ new Date());
-        sendEmail("offline");
-        needToSend = false;
-    }
-
+function setLightFromColor(color){
+	var rgb;
+    rgb = color.split(",")
+    console.log("Setting color to "+color);
+    console.log(rgb);
+    var r=parseInt(rgb[0],10);
+    var g=parseInt(rgb[1],10);
+    var b=parseInt(rgb[2],10);
+    hueState = lightState.create().rgb(r,g,b);
+    hueState.on();
+    setLight(hueState);
 }
 
-function checkPiHealth(){
-    request('http://127.0.0.1:1337', function (error, response, body) {
-        if(error){
-            logOnline = true;
-            sendAlert();
-        } else {
-            if(logOnline){
-                console.log("GFCI is back online at: "+ new Date());
-                sendEmail("online");
-                logOnline = false;
-            }
-            needToSend = true;
-        }
-    });
+function setHueBrightness(brightness){
+	console.log("setting brightness");
+	hueState = lightState.create().brightness(brightness).on();
+	setLight(hueState);
 }
+*/
+
+
+function flipHueOn(){
+	hueState = lightState.create().on();
+	setLight(hueState);
+}
+
+function flipHueOff(){
+	console.log("turning hue off");
+	hueState = lightState.create().off();
+	setLight(hueState);
+}
+
+function setLight(hueState){
+    api.setLightState(1, hueState)
+        .then()
+        .done();
+    api.setLightState(2, hueState)
+        .then()
+        .done();
+    api.setLightState(3, hueState)
+        .then()
+        .done();       
+}
+
+
