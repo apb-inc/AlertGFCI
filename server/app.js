@@ -12,9 +12,6 @@ var port = process.env.PORT || 1337;
 var router = express.Router();
 // Route settings
 app.use('/', router);
-app.set('views', __dirname + '/views');
-app.set('view engine', 'ejs');
-app.use(express.static(__dirname + '/public'));
 app.listen(port);
 console.log('Magic happens on port ' + port +" - "+ new Date());
 
