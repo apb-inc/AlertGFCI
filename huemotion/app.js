@@ -10,7 +10,7 @@ var hue = require("node-hue-api");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-var port = process.env.PORT || 1338;
+var port = process.env.PORT || 80;
 var router = express.Router();
 // Route settings
 app.use('/', router);
@@ -27,7 +27,7 @@ var HueApi = hue.HueApi;
 var lightState = hue.lightState;
 var curTime;
 
-var hostname = "192.168.1.116",
+var hostname = "192.168.0.103",
     username = "22ae6b2233c8b2971a18523e9343ca3",
     api;
 
@@ -56,7 +56,7 @@ setInterval(function(){
 
 
 router.get('/', function(req,res){
-	start();
+    startHueTimer();       
     res.send({"status":"200"});        
 });
 
@@ -70,14 +70,24 @@ var updateTimer = function(status) {
     //console.log(JSON.stringify(status, null, 2));
 };
 
+var displayResult = function(result) {
+    console.log(JSON.stringify(result, null, 2));
+};
+
+
+/*
+api.lights()
+    .then(displayResult)
+    .done();
+*/
 
 
 
 
 function startHueTimer(){
-	api.lightStatus(1)
+	api.lightStatus(9)
     	.then(updateTimer)
-		.done();
+		.done(displayResult);
 }
 
 
@@ -117,15 +127,10 @@ function flipHueOff(){
 }
 
 function setLight(hueState){
-    api.setLightState(1, hueState)
+    api.setLightState(9, hueState)
         .then()
         .done();
-    api.setLightState(2, hueState)
-        .then()
-        .done();
-    api.setLightState(3, hueState)
-        .then()
-        .done();       
+    
 }
 
 
