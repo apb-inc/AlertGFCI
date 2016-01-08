@@ -30,10 +30,10 @@ function sendEmail(type){
 
 
     if(type == "online"){
-        emailContent = "The GFCI is back online "+currentTime;
+        emailContent = "The Holka server is back online "+currentTime;
 
     } else if(type == "offline") {
-        emailContent = "The GFCI has tripped! "+currentTime;
+        emailContent = "The Holka server has went offline! "+currentTime;
     }
 
     var transporter = nodemailer.createTransport({
@@ -63,7 +63,7 @@ function sendEmail(type){
 function sendAlert(){
 
     if(needToSend){
-        console.log("GFCI has tripped at: "+ new Date());
+        console.log("Holka server has went offline at: "+ new Date());
         sendEmail("offline");
         needToSend = false;
     }
@@ -71,13 +71,13 @@ function sendAlert(){
 }
 
 function checkPiHealth(){
-    request('http://192.168.1.115:1337', function (error, response, body) {
+    request(loginInfo.ip, function (error, response, body) {
         if(error){
             logOnline = true;
             sendAlert();
         } else {
             if(logOnline){
-                console.log("GFCI is back online at: "+ new Date());
+                console.log("Holka server is back online at: "+ new Date());
                 sendEmail("online");
                 logOnline = false;
             }
