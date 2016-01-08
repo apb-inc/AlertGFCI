@@ -35,7 +35,7 @@ function sendEmail(type){
     } else if(type == "offline") {
         emailContent = "The Holka server has went offline! "+currentTime;
     }
-    
+
 
 
 
