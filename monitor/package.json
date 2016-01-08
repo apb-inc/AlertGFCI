@@ -1,0 +1,9 @@
+{
+    "name": "GFCIAlert",
+    "description": "App that automates floating",
+    "version": "0.0.1",
+    "main": "app.js",
+    "dependencies": {
+        "express": "4.13.3"
+    }
+}
