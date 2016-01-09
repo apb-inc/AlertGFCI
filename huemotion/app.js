@@ -21,7 +21,7 @@ app.listen(port);
 console.log('Magic happens on port ' + port +" - "+ new Date());
 
 var lightsOffTime = new Date();
-var lightTimer = 10;
+var lightTimer = 20;
 
 var HueApi = hue.HueApi;
 var lightState = hue.lightState;
@@ -33,11 +33,10 @@ var hostname = "192.168.0.103",
 
 api = new HueApi(hostname, username);
 
-
-
 sensor.watch(function(err, value) {
     if (value==1){
-        startHueTimer();       
+	    flipHueOn();
+        updateHueTimer();       
     } 
 });
 
@@ -49,70 +48,19 @@ setInterval(function(){
 
 }, 1*60*1000);
 
-
-
-
-
-
-
 router.get('/', function(req,res){
-    startHueTimer();       
+    updateHueTimer();       
     res.send({"status":"200"});        
 });
-
-
-
-var updateTimer = function(status) {
-		
-	var curTime = new Date();
-	lightsOffTime = new Date(curTime.getTime() + lightTimer*60*1000);		
-	flipHueOn();
-    //console.log(JSON.stringify(status, null, 2));
-};
 
 var displayResult = function(result) {
     console.log(JSON.stringify(result, null, 2));
 };
 
-
-/*
-api.lights()
-    .then(displayResult)
-    .done();
-*/
-
-
-
-
-function startHueTimer(){
-	api.lightStatus(9)
-    	.then(updateTimer)
-		.done(displayResult);
+function updateHueTimer(){
+	var curTime = new Date();
+	lightsOffTime = new Date(curTime.getTime() + lightTimer*60*1000);		
 }
-
-
-
-/*
-
-function setLightFromColor(color){
-	var rgb;
-    rgb = color.split(",")
-    console.log("Setting color to "+color);
-    console.log(rgb);
-    var r=parseInt(rgb[0],10);
-    var g=parseInt(rgb[1],10);
-    var b=parseInt(rgb[2],10);
-    hueState = lightState.create().rgb(r,g,b);
-    hueState.on();
-    setLight(hueState);
-}
-
-function setHueBrightness(brightness){
-	console.log("setting brightness");
-	hueState = lightState.create().brightness(brightness).on();
-	setLight(hueState);
-}
-*/
 
 
 function flipHueOn(){
@@ -121,16 +69,22 @@ function flipHueOn(){
 }
 
 function flipHueOff(){
-	console.log("turning hue off");
 	hueState = lightState.create().off();
 	setLight(hueState);
 }
 
 function setLight(hueState){
-    api.setLightState(9, hueState)
+    api.setLightState(1, hueState)
         .then()
         .done();
     
+    api.setLightState(2, hueState)
+        .then()
+        .done();
+        
+    api.setLightState(3, hueState)
+        .then()
+        .done();    
 }
 
 
