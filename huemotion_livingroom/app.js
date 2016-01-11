@@ -7,7 +7,7 @@ var Gpio = require('onoff').Gpio;
 var sensor = new Gpio(14, 'in','both');
 var hue = require("node-hue-api");
 var CronJob = require('cron').CronJob;
-var dashButton = require('node-dash-button'),
+//var dashButton = require('node-dash-button');
 
 
 
@@ -38,7 +38,8 @@ api = new HueApi(hostname, username);
 
 sensor.watch(function(err, value) {
     if (value==1){
-	    flipHueOn();
+	console.log("flip on motion");
+	flipHueOn();
         updateHueTimer();       
     } 
 });
@@ -53,8 +54,9 @@ setInterval(function(){
 
 
 var job = new CronJob({
-	cronTime: '00 30 19 * * *',
+	cronTime: '00 47 20 * * 0-6',
 	onTick: function() {
+		console.log("cron");
 		flipHueOff();
 	},
 	start: false,
@@ -63,13 +65,6 @@ var job = new CronJob({
 job.start();
 
 
-try {
-	new CronJob('00 30 19 * * *', function() {
-		console.log('this should not be printed');
-	})
-} catch(ex) {
-	console.log("cron pattern not valid");
-}
 
 
 router.get('/', function(req,res){
