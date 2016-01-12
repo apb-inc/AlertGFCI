@@ -38,7 +38,7 @@ api = new HueApi(hostname, username);
 
 sensor.watch(function(err, value) {
     if (value==1){
-	console.log("flip on motion");
+	console.log("flip on motion - "+new Date());
 	flipHueOn();
         updateHueTimer();       
     } 
@@ -54,9 +54,9 @@ setInterval(function(){
 
 
 var job = new CronJob({
-	cronTime: '00 47 20 * * 0-6',
+	cronTime: '00 10 23 * * 0-6',
 	onTick: function() {
-		console.log("cron");
+		console.log("cron - " + new Date());
 		flipHueOff();
 	},
 	start: false,
@@ -65,6 +65,16 @@ var job = new CronJob({
 job.start();
 
 
+var jobTwo = new CronJob({
+	cronTime: '00 10 12 * * 0-6',
+	onTick: function() {
+		console.log("cron - " + new Date());
+		flipHueOff();
+	},
+	start: false,
+	timeZone: 'America/Chicago'
+});
+jobTwo.start();
 
 
 router.get('/', function(req,res){
