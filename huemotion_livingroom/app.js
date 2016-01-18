@@ -24,7 +24,7 @@ app.listen(port);
 console.log('Magic happens on port ' + port +" - "+ new Date());
 
 var lightsOffTime = new Date();
-var lightTimer = 60;
+var lightTimer = 30;
 
 var HueApi = hue.HueApi;
 var lightState = hue.lightState;
