@@ -6,11 +6,14 @@ var request = require('request');
 var Gpio = require('onoff').Gpio;
 var sensor = new Gpio(14, 'in','both');
 var hue = require("node-hue-api");
+var CronJob = require('cron').CronJob;
+//var dashButton = require('node-dash-button');
+
 
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-var port = process.env.PORT || 1337;
+var port = process.env.PORT ||8080;
 var router = express.Router();
 // Route settings
 app.use('/', router);
@@ -21,7 +24,7 @@ app.listen(port);
 console.log('Magic happens on port ' + port +" - "+ new Date());
 
 var lightsOffTime = new Date();
-var lightTimer = 20;
+var lightTimer = 30;
 
 var HueApi = hue.HueApi;
 var lightState = hue.lightState;
@@ -35,8 +38,8 @@ api = new HueApi(hostname, username);
 
 sensor.watch(function(err, value) {
     if (value==1){
-	console.log("flip on"+new Date());
-	    flipHueOn();
+	console.log("flip on motion - "+new Date());
+	flipHueOn();
         updateHueTimer();       
     } 
 });
@@ -48,6 +51,31 @@ setInterval(function(){
 	}
 
 }, 5*60*1000);
+
+
+var job = new CronJob({
+	cronTime: '00 10 23 * * 0-6',
+	onTick: function() {
+		console.log("cron - " + new Date());
+		flipHueOff();
+	},
+	start: false,
+	timeZone: 'America/Chicago'
+});
+job.start();
+
+
+var jobTwo = new CronJob({
+	cronTime: '00 10 12 * * 0-6',
+	onTick: function() {
+		console.log("cron - " + new Date());
+		flipHueOff();
+	},
+	start: false,
+	timeZone: 'America/Chicago'
+});
+jobTwo.start();
+
 
 router.get('/', function(req,res){
     updateHueTimer();       
@@ -75,17 +103,18 @@ function flipHueOff(){
 }
 
 function setLight(hueState){
-    api.setLightState(1, hueState)
+    api.setLightState(5, hueState)
         .then()
         .done();
-    
-    api.setLightState(2, hueState)
+    api.setLightState(6, hueState)
         .then()
         .done();
-        
-    api.setLightState(3, hueState)
+    api.setLightState(7, hueState)
         .then()
-        .done();    
+        .done();  
+    api.setLightState(9, hueState)
+        .then()
+        .done();  
 }
 
 

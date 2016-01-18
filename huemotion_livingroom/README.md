@@ -1,0 +1,1 @@
+Run this app on a raspberry pi with connected hue to have lights turn on with motion
