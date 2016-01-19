@@ -1,30 +1,8 @@
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser');
-var nodemailer = require('nodemailer');
-var request = require('request');
-var Gpio = require('onoff').Gpio;
-var sensor = new Gpio(14, 'in','both');
+//warning this may trigger multiple times for one press
+//...usually triggers twice based on testing for each press
+dash_button = require('node-dash-button');
+var dash = dash_button("74:c2:46:e8:91:f8"); //address from step above
 var hue = require("node-hue-api");
-var CronJob = require('cron').CronJob;
-//var dashButton = require('node-dash-button');
-
-
-
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-var port = process.env.PORT ||8080;
-var router = express.Router();
-// Route settings
-app.use('/', router);
-app.set('views', __dirname + '/views');
-app.set('view engine', 'ejs');
-app.use(express.static(__dirname + '/public'));
-app.listen(port);
-console.log('Magic happens on port ' + port +" - "+ new Date());
-
-var lightsOffTime = new Date();
-var lightTimer = 30;
 
 var HueApi = hue.HueApi;
 var lightState = hue.lightState;
@@ -36,71 +14,82 @@ var hostname = "192.168.0.103",
 
 api = new HueApi(hostname, username);
 
-sensor.watch(function(err, value) {
-    if (value==1){
-	console.log("flip on motion - "+new Date());
-	flipHueOn();
-        updateHueTimer();       
-    } 
-});
 
-setInterval(function(){
-	curTime = new Date();
-	if(curTime > lightsOffTime){
-		flipHueOff();
+console.log("start");
+var count =0;
+dash.on("detected", function (){
+	
+	if (count>9){
+		count = 0;
+	}
+	console.log("count"+count);
+	switch(count) {
+	    case 0:
+			setLightFromColor("152,0,0");
+			count++;	
+	        break;
+	    case 1:
+			setLightFromColor("255,0,0");	
+			count++;	
+	        break;
+	    case 2:
+			setLightFromColor("255,153,0");	
+			count++;	
+	        break;
+	    case 3:
+			setLightFromColor("255,255,0");
+			count++;	
+	        break;
+	    case 4:
+			setLightFromColor("0,255,0");
+			count++;	
+	        break;
+	    case 5:
+			setLightFromColor("74,134,232");
+			count++;	
+	        break;
+	    case 6:
+			setLightFromColor("0,0,255");
+			count++;	
+	        break;
+	    case 7:
+			setLightFromColor("153,0,255");
+			count++;	
+	        break;
+	    case 8:
+			setLightFromColor("255,0,255");
+			count++;	
+	        break;
+	    case 9:
+			setLightFromColor("255,255,255");
+			count++;	
+	        break;
+	        	        
+	    default:
 	}
 
-}, 5*60*1000);
 
-
-var job = new CronJob({
-	cronTime: '00 10 23 * * 0-6',
-	onTick: function() {
-		console.log("cron - " + new Date());
-		flipHueOff();
-	},
-	start: false,
-	timeZone: 'America/Chicago'
-});
-job.start();
-
-
-var jobTwo = new CronJob({
-	cronTime: '00 10 12 * * 0-6',
-	onTick: function() {
-		console.log("cron - " + new Date());
-		flipHueOff();
-	},
-	start: false,
-	timeZone: 'America/Chicago'
-});
-jobTwo.start();
-
-
-router.get('/', function(req,res){
-    updateHueTimer();       
-    res.send({"status":"200"});        
+	
 });
 
-var displayResult = function(result) {
-    console.log(JSON.stringify(result, null, 2));
-};
 
-function updateHueTimer(){
-	var curTime = new Date();
-	lightsOffTime = new Date(curTime.getTime() + lightTimer*60*1000);		
+
+
+
+
+function setLightFromColor(color){
+	var rgb;
+    rgb = color.split(",")
+    console.log("Setting color to "+color);
+    console.log(rgb);
+    var r=parseInt(rgb[0],10);
+    var g=parseInt(rgb[1],10);
+    var b=parseInt(rgb[2],10);
+    hueState = lightState.create().rgb(r,g,b);
+    hueState.on();
+    setLight(hueState);
 }
 
-
-function flipHueOn(){
-	hueState = lightState.create().on();
-	setLight(hueState);
-}
-
-function flipHueOff(){
-	hueState = lightState.create().off();
-	setLight(hueState);
-}
 
 function setLight(hueState){
     api.setLightState(5, hueState)
@@ -114,7 +103,5 @@ function setLight(hueState){
         .done();  
     api.setLightState(9, hueState)
         .then()
-        .done();  
+        .done();      
 }
-
-

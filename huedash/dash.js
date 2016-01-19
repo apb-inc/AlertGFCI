@@ -15,11 +15,14 @@ var hostname = "192.168.0.103",
 api = new HueApi(hostname, username);
 
 
-console.log("start");
+console.log("start2");
 var count =0;
 dash.on("detected", function (){
 	
-	
+	if (count>6){
+		count = 0;
+	}
+	console.log("count"+count);
 	switch(count) {
 	    case 0:
 			setLightFromColor("255,255,255");
