@@ -41,6 +41,14 @@ dash.on("detected", function (){
 			setLightFromColor("0,255,0");
 			count++;	
 	        break;
+	    case 5:
+			setLightFromColor("255,128,0");
+			count++;	
+	        break;
+	    case 6:
+			setLightFromColor("0,0,255");
+			count++;	
+	        break;
 	    default:
 	}
 
