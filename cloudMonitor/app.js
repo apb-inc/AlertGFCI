@@ -18,26 +18,34 @@ console.log('Magic happens on port ' + port +" - "+ new Date());
 var healthCheckMins = 30;
 var needToSend = true;
 var logOnline = false;
+var needToSendGFCI = true;
+var logOnlineGFCI = false;
+
 
 setInterval(function(){
     //This will check if the pi is online every x number of minutes
     checkPiHealth();
-},5000);
+},5*60*1000);
+
+setInterval(function(){
+    //This will check if the pi is online every x number of minutes
+    checkPiGFCIHealth();
+},6*60*1000);
 
 function sendEmail(type){
     var currentTime = new Date();
     var emailContent;
-
 
     if(type == "online"){
         emailContent = "The Holka server is back online "+currentTime;
 
     } else if(type == "offline") {
         emailContent = "The Holka server has went offline! "+currentTime;
+    } else if(type == "offlineGFCI") {
+        emailContent = "The GFCI has went offline! "+currentTime;
+    } else if(type == "onlineGFCI") {
+        emailContent = "The GFCI has went online! "+currentTime;
     }
-
-
-
 
     var transporter = nodemailer.createTransport({
         service: 'Gmail',
@@ -88,3 +96,34 @@ function checkPiHealth(){
         }
     });
 }
+
+
+
+
+function sendGFCIAlert(){
+
+    if(needToSendGFCI){
+        console.log("GFCI has went offline at: "+ new Date());
+        sendEmail("offlineGFCI");
+        needToSendGFCI = false;
+    }
+
+}
+
+function checkPiGFCIHealth(){
+    request(loginInfo.ipGFCI, function (error, response, body) {
+        if(error){
+            logOnlineGFCI = true;
+            sendGFCIAlert();
+        } else {
+            if(logOnlineGFCI){
+                console.log("GFCI is back online at: "+ new Date());
+                sendEmail("onlineGFCI");
+                logOnlineGFCI = false;
+            }
+            needToSendGFCI = true;
+        }
+    });
+}
+
+
