@@ -20,6 +20,8 @@ var needToSend = true;
 var logOnline = false;
 var needToSendGFCI = true;
 var logOnlineGFCI = false;
+var needToSendDash= true;
+var logOnlineDash = false;
 
 
 setInterval(function(){
@@ -28,9 +30,15 @@ setInterval(function(){
 },5*60*1000);
 
 setInterval(function(){
-    //This will check if the pi is online every x number of minutes
+    //This will check if the pi2 GFCI is online every x number of minutes
     checkPiGFCIHealth();
 },6*60*1000);
+
+setInterval(function(){
+    //This will check if the pi is online every x number of minutes
+    checkPiDashHealth();
+},7*60*1000);
+
 
 function sendEmail(type){
     var currentTime = new Date();
@@ -38,13 +46,16 @@ function sendEmail(type){
 
     if(type == "online"){
         emailContent = "The Holka server is back online "+currentTime;
-
     } else if(type == "offline") {
         emailContent = "The Holka server has went offline! "+currentTime;
     } else if(type == "offlineGFCI") {
         emailContent = "The GFCI has went offline! "+currentTime;
     } else if(type == "onlineGFCI") {
         emailContent = "The GFCI has went online! "+currentTime;
+    } else if(type == "offlineDash") {
+        emailContent = "Node-Dash has went offline! "+currentTime;
+    } else if(type == "onlineDash") {
+        emailContent = "Node-Dash has went online! "+currentTime;
     }
 
     var transporter = nodemailer.createTransport({
@@ -72,13 +83,11 @@ function sendEmail(type){
 
 
 function sendAlert(){
-
     if(needToSend){
         console.log("Holka server has went offline at: "+ new Date());
         sendEmail("offline");
         needToSend = false;
     }
-
 }
 
 function checkPiHealth(){
@@ -125,5 +134,34 @@ function checkPiGFCIHealth(){
         }
     });
 }
+
+
+
+function sendDashlert(){
+
+    if(needToSendDash){
+        console.log("Dash has went offline at: "+ new Date());
+        sendEmail("offlineDash");
+        needToSendDash = false;
+    }
+
+}
+
+function checkPiDashHealth(){
+    request(loginInfo.ipDash, function (error, response, body) {
+        if(error){
+            logOnlineDash = true;
+            sendDashlert();
+        } else {
+            if(logOnlineGFCI){
+                console.log("Dash is back online at: "+ new Date());
+                sendEmail("onlineDash");
+                logOnlineDash = false;
+            }
+            needToSendDash = true;
+        }
+    });
+}
+
 
 
