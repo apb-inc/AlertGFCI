@@ -10,7 +10,7 @@ var hue = require("node-hue-api");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-var port = process.env.PORT || 80;
+var port = process.env.PORT || 1337;
 var router = express.Router();
 // Route settings
 app.use('/', router);
@@ -35,6 +35,7 @@ api = new HueApi(hostname, username);
 
 sensor.watch(function(err, value) {
     if (value==1){
+	console.log("flip on"+new Date());
 	    flipHueOn();
         updateHueTimer();       
     } 
