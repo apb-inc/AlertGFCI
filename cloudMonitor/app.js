@@ -31,7 +31,7 @@ setInterval(function(){
 
 setInterval(function(){
     //This will check if the pi2 GFCI is online every x number of minutes
-    checkPiGFCIHealth();
+//    checkPiGFCIHealth();
 },6*60*1000);
 
 setInterval(function(){
@@ -153,7 +153,7 @@ function checkPiDashHealth(){
             logOnlineDash = true;
             sendDashlert();
         } else {
-            if(logOnlineGFCI){
+            if(logOnlineDash){
                 console.log("Dash is back online at: "+ new Date());
                 sendEmail("onlineDash");
                 logOnlineDash = false;
