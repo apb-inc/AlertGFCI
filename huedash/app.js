@@ -4,6 +4,16 @@ dash_button = require('node-dash-button');
 var dash = dash_button("74:c2:46:e8:91:f8"); //address from step above
 var hue = require("node-hue-api");
 
+
+var express = require('express');
+var app = express();
+var port = process.env.PORT || 2600;
+var router = express.Router();
+app.listen(port);
+console.log('Magic happens on port ' + port +" - "+ new Date());
+
+
+
 var HueApi = hue.HueApi;
 var lightState = hue.lightState;
 var curTime;
@@ -15,7 +25,12 @@ var hostname = "192.168.0.103",
 api = new HueApi(hostname, username);
 
 
-console.log("start");
+
+app.get('/', function(req,res){
+    res.send({"status":"200"});        
+});
+
+
 var count =0;
 dash.on("detected", function (){
 	

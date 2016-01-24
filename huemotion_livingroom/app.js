@@ -24,7 +24,7 @@ app.listen(port);
 console.log('Magic happens on port ' + port +" - "+ new Date());
 
 var lightsOffTime = new Date();
-var lightTimer = 30;
+var lightTimer = 15;
 
 var HueApi = hue.HueApi;
 var lightState = hue.lightState;
@@ -46,8 +46,11 @@ sensor.watch(function(err, value) {
 
 setInterval(function(){
 	curTime = new Date();
+	console.log("Cur time"+ curTime);
+	console.log("Lights off time"+lightsOffTime);
 	if(curTime > lightsOffTime){
 		flipHueOff();
+		console.log("flipping hue off");
 	}
 
 }, 5*60*1000);
@@ -78,7 +81,6 @@ jobTwo.start();
 
 
 router.get('/', function(req,res){
-    updateHueTimer();       
     res.send({"status":"200"});        
 });
 
