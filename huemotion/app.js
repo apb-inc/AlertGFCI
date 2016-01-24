@@ -43,38 +43,48 @@ sensor.watch(function(err, value) {
 
 setInterval(function(){
 	curTime = new Date();
+	console.log("curtime"+ curTime+"light off"+lightsOffTime)
 	if(curTime > lightsOffTime){
+		console.log("flip off" + new Date());
 		flipHueOff();
 	}
 
-}, 5*60*1000);
+}, .1*60*1000);
 
 router.get('/', function(req,res){
-    updateHueTimer();       
     res.send({"status":"200"});        
 });
+
+router.get('/extend', function(req,res){
+	console.log("updating hue timer via extend"+new Date());
+	lightsOffTime = new Date(curTime.getTime() + 15*60*1000);		
+    res.send({"status":"200"});        
+});
+
+
 
 var displayResult = function(result) {
     console.log(JSON.stringify(result, null, 2));
 };
 
 function updateHueTimer(){
-	var curTime = new Date();
+	console.log("updating hue timer"+new Date());
+	curTime = new Date();
 	lightsOffTime = new Date(curTime.getTime() + lightTimer*60*1000);		
 }
 
 
 function flipHueOn(){
 	hueState = lightState.create().on();
-	setLight(hueState);
+	setLight(hueState,false);
 }
 
 function flipHueOff(){
 	hueState = lightState.create().off();
-	setLight(hueState);
+	setLight(hueState,true);
 }
 
-function setLight(hueState){
+function setLight(hueState,isFloat){
     api.setLightState(1, hueState)
         .then()
         .done();
@@ -86,6 +96,13 @@ function setLight(hueState){
     api.setLightState(3, hueState)
         .then()
         .done();    
+        
+    if(isFloat){
+		api.setLightState(8, hueState)
+		    .then()
+		    .done();            
+    }
+        
 }
 
 
