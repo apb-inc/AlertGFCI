@@ -49,7 +49,7 @@ setInterval(function(){
 		flipHueOff();
 	}
 
-}, .1*60*1000);
+}, 5*60*1000);
 
 router.get('/', function(req,res){
     res.send({"status":"200"});        
