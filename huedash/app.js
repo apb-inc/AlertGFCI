@@ -24,6 +24,10 @@ var hostname = "192.168.0.103",
 
 api = new HueApi(hostname, username);
 
+var displayError = function(err) {
+    console.error(err);
+};
+
 
 
 app.get('/', function(req,res){
@@ -78,8 +82,7 @@ dash.on("detected", function (){
 	    case 9:
 			setLightFromColor("255,255,255");
 			count++;	
-	        break;
-	        	        
+	        break;        
 	    default:
 	}
 
@@ -109,14 +112,18 @@ function setLightFromColor(color){
 function setLight(hueState){
     api.setLightState(5, hueState)
         .then()
+        .fail(displayError)
         .done();
     api.setLightState(6, hueState)
         .then()
+        .fail(displayError)
         .done();
     api.setLightState(7, hueState)
         .then()
+        .fail(displayError)
         .done();  
     api.setLightState(9, hueState)
         .then()
+        .fail(displayError)
         .done();      
 }
