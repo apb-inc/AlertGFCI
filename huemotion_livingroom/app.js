@@ -4,7 +4,8 @@ var bodyParser = require('body-parser');
 var nodemailer = require('nodemailer');
 var request = require('request');
 var Gpio = require('onoff').Gpio;
-var sensor = new Gpio(14, 'in','both');
+var sensorOne = new Gpio(14, 'in','both');
+var sensorTwo = new Gpio(21, 'in','both');
 var hue = require("node-hue-api");
 var CronJob = require('cron').CronJob;
 //var dashButton = require('node-dash-button');
@@ -24,6 +25,7 @@ app.listen(port);
 console.log('Magic happens on port ' + port +" - "+ new Date());
 
 var lightsOffTime = new Date();
+var lightsOffTimeTwo = new Date();
 var lightTimer = 15;
 
 var HueApi = hue.HueApi;
@@ -36,10 +38,23 @@ var hostname = "192.168.0.103",
 
 api = new HueApi(hostname, username);
 
-sensor.watch(function(err, value) {
+
+sensorTwo.watch(function(err, value) {
+	console.log("Two val"+value);
     if (value==1){
-	console.log("flip on motion - "+new Date());
-	flipHueOn();
+		console.log("flip on motion two - "+new Date());
+		flipHueTwoOn();
+        updateHueTimerTwo();       
+    } 
+});
+
+
+
+sensorOne.watch(function(err, value) {
+	console.log("One val"+value);
+    if (value==1){
+		console.log("flip on motion one - "+new Date());
+		flipHueOn();
         updateHueTimer();       
     } 
 });
@@ -52,8 +67,18 @@ setInterval(function(){
 		flipHueOff();
 		console.log("flipping hue off");
 	}
-
 }, 5*60*1000);
+
+setInterval(function(){
+	curTime = new Date();
+	console.log("Cur time"+ curTime);
+	console.log("Lights off time"+lightsOffTimeTwo);
+	if(curTime > lightsOffTime){
+		flipHueTwoOff();
+		console.log("flipping hue off");
+	}
+}, 5*60*1000);
+
 
 
 var job = new CronJob({
@@ -61,6 +86,7 @@ var job = new CronJob({
 	onTick: function() {
 		console.log("cron - " + new Date());
 		flipHueOff();
+		flipHueTwoOff();
 	},
 	start: false,
 	timeZone: 'America/Chicago'
@@ -73,6 +99,7 @@ var jobTwo = new CronJob({
 	onTick: function() {
 		console.log("cron - " + new Date());
 		flipHueOff();
+		flipHueTwoOff();
 	},
 	start: false,
 	timeZone: 'America/Chicago'
@@ -93,6 +120,11 @@ function updateHueTimer(){
 	lightsOffTime = new Date(curTime.getTime() + lightTimer*60*1000);		
 }
 
+function updateHueTimerTwo(){
+	var curTime = new Date();
+	lightsOffTimeTwo = new Date(curTime.getTime() + lightTimer*60*1000);		
+}
+
 
 function flipHueOn(){
 	hueState = lightState.create().on();
@@ -104,19 +136,34 @@ function flipHueOff(){
 	setLight(hueState);
 }
 
+
+function flipHueTwoOn(){
+	hueState = lightState.create().on();
+	setLightTwo(hueState);
+}
+
+function flipHueTwoOff(){
+	hueState = lightState.create().off();
+	setLightTwo(hueState);
+}
+
+
 function setLight(hueState){
     api.setLightState(5, hueState)
         .then()
         .done();
     api.setLightState(6, hueState)
         .then()
-        .done();
-    api.setLightState(7, hueState)
-        .then()
-        .done();  
+        .done(); 
     api.setLightState(9, hueState)
         .then()
         .done();  
+}
+
+function setLightTwo(hueState){
+	api.setLightState(7, hueState)
+        .then()
+        .done(); 
 }
 
 
