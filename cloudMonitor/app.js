@@ -41,8 +41,10 @@ setInterval(function(){
 
 
 function sendEmail(type){
+
     var currentTime = new Date();
-    var emailContent;
+	currentTime = new Date(currentTime.getTime()-60*60*1000);
+	var emailContent;
 
     if(type == "online"){
         emailContent = "The Holka server is back online "+currentTime;
