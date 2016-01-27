@@ -10,7 +10,7 @@ var hue = require("node-hue-api");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-var port = process.env.PORT || 1337;
+var port = process.env.PORT || 2601;
 var router = express.Router();
 // Route settings
 app.use('/', router);
