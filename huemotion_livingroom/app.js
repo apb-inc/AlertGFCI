@@ -62,25 +62,26 @@ sensorOne.watch(function(err, value) {
 setInterval(function(){
 	curTime = new Date();
 	console.log("Cur time"+ curTime);
-	console.log("Lights off time"+lightsOffTime);
+	console.log("Cur time"+ curTime + "lights off two time"+lightsOffTime);
 	if(curTime > lightsOffTime){
 		flipHueOff();
 		console.log("flipping hue off");
 	}
-}, 5*60*1000);
+}, 8*60*1000);
 
 setInterval(function(){
 	curTime = new Date();
-	console.log("Cur time"+ curTime);
+	console.log("Cur time"+ curTime + "lights off two time"+lightsOffTimeTwo);
 	console.log("Lights off time"+lightsOffTimeTwo);
-	if(curTime > lightsOffTime){
+	if(curTime > lightsOffTimeTwo){
 		flipHueTwoOff();
-		console.log("flipping hue off");
+		console.log("flipping two hue off");
 	}
 }, 5*60*1000);
 
 
 
+/*
 var job = new CronJob({
 	cronTime: '00 10 23 * * 0-6',
 	onTick: function() {
@@ -105,11 +106,14 @@ var jobTwo = new CronJob({
 	timeZone: 'America/Chicago'
 });
 jobTwo.start();
+*/
 
 
+/*
 router.get('/', function(req,res){
     res.send({"status":"200"});        
 });
+*/
 
 var displayResult = function(result) {
     console.log(JSON.stringify(result, null, 2));
