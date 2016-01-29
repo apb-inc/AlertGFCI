@@ -1,7 +1,11 @@
 //warning this may trigger multiple times for one press
 //...usually triggers twice based on testing for each press
 dash_button = require('node-dash-button');
-var dash = dash_button("74:c2:46:e8:91:f8"); //address from step above
+var dash_br = dash_button("74:c2:46:e8:91:f8"); //address from step above
+var dash_lr = dash_button("10:ae:60:5d:49:cd"); //address from step above
+
+
+
 var hue = require("node-hue-api");
 
 
@@ -31,63 +35,114 @@ var displayError = function(err) {
 
 
 app.get('/', function(req,res){
-    res.send({"status":"200"});        
+    res.send({"status":"200"});
 });
 
 
-var count =0;
-dash.on("detected", function (){
-	
+var count=0;
+dash_lr.on("detected", function (){
+
 	if (count>9){
 		count = 0;
 	}
 	console.log("count"+count);
 	switch(count) {
 	    case 0:
-			setLightFromColor("152,0,0");
-			count++;	
+			setLightFromColor("152,0,0", "dash_lr");
+			count++;
 	        break;
 	    case 1:
-			setLightFromColor("255,0,0");	
-			count++;	
+			setLightFromColor("255,0,0", "dash_lr");
+			count++;
 	        break;
 	    case 2:
-			setLightFromColor("255,153,0");	
-			count++;	
+			setLightFromColor("255,153,0", "dash_lr");
+			count++;
 	        break;
 	    case 3:
-			setLightFromColor("255,255,0");
-			count++;	
+			setLightFromColor("255,255,0", "dash_lr");
+			count++;
 	        break;
 	    case 4:
-			setLightFromColor("0,255,0");
-			count++;	
+			setLightFromColor("0,255,0", "dash_lr");
+			count++;
 	        break;
 	    case 5:
-			setLightFromColor("74,134,232");
-			count++;	
+			setLightFromColor("74,134,232", "dash_lr");
+			count++;
 	        break;
 	    case 6:
-			setLightFromColor("0,0,255");
-			count++;	
+			setLightFromColor("0,0,255", "dash_lr");
+			count++;
 	        break;
 	    case 7:
-			setLightFromColor("153,0,255");
-			count++;	
+			setLightFromColor("153,0,255", "dash_lr");
+			count++;
 	        break;
 	    case 8:
-			setLightFromColor("255,0,255");
-			count++;	
+			setLightFromColor("255,0,255", "dash_lr");
+			count++;
 	        break;
 	    case 9:
-			setLightFromColor("255,255,255");
-			count++;	
-	        break;        
+			setLightFromColor("255,255,255", "dash_lr");
+			count++;
+	        break;
 	    default:
 	}
 
+});
 
-	
+var countTwo=0;
+dash_br.on("detected", function (){
+
+	if (countTwo>9){
+		countTwo = 0;
+	}
+	console.log("count"+countTwo);
+	switch(countTwo) {
+	    case 0:
+			setLightFromColor("152,0,0","dash_br");
+			countTwo++;
+	        break;
+	    case 1:
+			setLightFromColor("255,0,0","dash_br");
+			countTwo++;
+	        break;
+	    case 2:
+			setLightFromColor("255,153,0","dash_br");
+			countTwo++;
+	        break;
+	    case 3:
+			setLightFromColor("255,255,0","dash_br");
+			countTwo++;
+	        break;
+	    case 4:
+			setLightFromColor("0,255,0","dash_br");
+			countTwo++;
+	        break;
+	    case 5:
+			setLightFromColor("74,134,232","dash_br");
+			countTwo++;
+	        break;
+	    case 6:
+			setLightFromColor("0,0,255","dash_br");
+			countTwo++;
+	        break;
+	    case 7:
+			setLightFromColor("153,0,255","dash_br");
+			countTwo++;
+	        break;
+	    case 8:
+			setLightFromColor("255,0,255","dash_br");
+			countTwo++;
+	        break;
+	    case 9:
+			setLightFromColor("255,255,255","dash_br");
+			countTwo++;
+	        break;
+	    default:
+	}
+
 });
 
 
@@ -95,7 +150,9 @@ dash.on("detected", function (){
 
 
 
-function setLightFromColor(color){
+
+
+function setLightFromColor(color,button){
 	var rgb;
     rgb = color.split(",")
     console.log("Setting color to "+color);
@@ -105,25 +162,49 @@ function setLightFromColor(color){
     var b=parseInt(rgb[2],10);
     hueState = lightState.create().rgb(r,g,b);
     hueState.on();
-    setLight(hueState);
+    var isDash_lr = false;
+    if(button=="dash_lr"){
+        isDash_lr = true;
+    }
+    setLight(hueState, isDash_lr);
 }
 
 
-function setLight(hueState){
-    api.setLightState(5, hueState)
-        .then()
-        .fail(displayError)
-        .done();
-    api.setLightState(6, hueState)
-        .then()
-        .fail(displayError)
-        .done();
-    api.setLightState(7, hueState)
-        .then()
-        .fail(displayError)
-        .done();  
-    api.setLightState(9, hueState)
-        .then()
-        .fail(displayError)
-        .done();      
+function setLight(hueState, isDash_lr){
+    if(isDash_lr){
+        api.setLightState(5, hueState)
+            .then()
+            .fail(displayError)
+            .done();
+        api.setLightState(6, hueState)
+            .then()
+            .fail(displayError)
+            .done();
+        api.setLightState(7, hueState)
+            .then()
+            .fail(displayError)
+            .done();
+        api.setLightState(9, hueState)
+            .then()
+            .fail(displayError)
+            .done();
+    } else {
+        api.setLightState(1, hueState)
+            .then()
+            .fail(displayError)
+            .done();
+        api.setLightState(2, hueState)
+            .then()
+            .fail(displayError)
+            .done();
+        api.setLightState(3, hueState)
+            .then()
+            .fail(displayError)
+            .done();
+        api.setLightState(4, hueState)
+            .then()
+            .fail(displayError)
+            .done();
+    }
+
 }
