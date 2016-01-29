@@ -126,7 +126,7 @@ function updateHueTimer(){
 
 function updateHueTimerTwo(){
 	var curTime = new Date();
-	lightsOffTimeTwo = new Date(curTime.getTime() + lightTimer*60*1000);		
+	lightsOffTimeTwo = new Date(curTime.getTime() + lightsOffTimeTwo*60*1000);		
 }
 
 
@@ -153,21 +153,24 @@ function flipHueTwoOff(){
 
 
 function setLight(hueState){
-    api.setLightState(5, hueState)
-        .then()
-        .done();
-    api.setLightState(6, hueState)
-        .then()
-        .done(); 
-    api.setLightState(9, hueState)
-        .then()
-        .done();  
+	
+	api.setLightState(5, state, function(err, lights) {
+	    if (err) throw err;
+	});
+	api.setLightState(6, state, function(err, lights) {
+	    if (err) throw err;
+	});
+	api.setLightState(9, state, function(err, lights) {
+	    if (err) throw err;
+	});
+
+
 }
 
 function setLightTwo(hueState){
-	api.setLightState(7, hueState)
-        .then()
-        .done(); 
+	api.setLightState(7, state, function(err, lights) {
+	    if (err) throw err;
+	});
 }
 
 
