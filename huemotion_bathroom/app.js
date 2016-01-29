@@ -57,9 +57,18 @@ router.get('/', function(req,res){
 
 router.get('/extend', function(req,res){
 	console.log("updating hue timer via extend"+new Date());
+	curTime = new Date();
 	lightsOffTime = new Date(curTime.getTime() + 15*60*1000);		
     res.send({"status":"200"});        
 });
+
+router.get('/reset', function(req,res){
+	console.log("updating hue timer via reset"+new Date());
+	curTime = new Date();
+	lightsOffTime = new Date(curTime.getTime() + 2*60*100);		
+    res.send({"status":"200"});        
+});
+
 
 
 
