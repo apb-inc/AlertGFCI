@@ -154,13 +154,13 @@ function flipHueTwoOff(){
 
 function setLight(hueState){
 	
-	api.setLightState(5, state, function(err, lights) {
+	api.setLightState(5, hueState, function(err, lights) {
 	    if (err) throw err;
 	});
-	api.setLightState(6, state, function(err, lights) {
+	api.setLightState(6, hueState, function(err, lights) {
 	    if (err) throw err;
 	});
-	api.setLightState(9, state, function(err, lights) {
+	api.setLightState(9, hueState, function(err, lights) {
 	    if (err) throw err;
 	});
 
@@ -168,7 +168,7 @@ function setLight(hueState){
 }
 
 function setLightTwo(hueState){
-	api.setLightState(7, state, function(err, lights) {
+	api.setLightState(7, hueState, function(err, lights) {
 	    if (err) throw err;
 	});
 }
