@@ -31,7 +31,7 @@ setInterval(function(){
 
 setInterval(function(){
     //This will check if the pi2 GFCI is online every x number of minutes
-    checkPiGFCIHealth();
+//    checkPiGFCIHealth();
 },6*60*1000);
 
 setInterval(function(){
@@ -41,8 +41,10 @@ setInterval(function(){
 
 
 function sendEmail(type){
+
     var currentTime = new Date();
-    var emailContent;
+	currentTime = new Date(currentTime.getTime()-60*60*1000);
+	var emailContent;
 
     if(type == "online"){
         emailContent = "The Holka server is back online "+currentTime;
@@ -153,7 +155,7 @@ function checkPiDashHealth(){
             logOnlineDash = true;
             sendDashlert();
         } else {
-            if(logOnlineGFCI){
+            if(logOnlineDash){
                 console.log("Dash is back online at: "+ new Date());
                 sendEmail("onlineDash");
                 logOnlineDash = false;
