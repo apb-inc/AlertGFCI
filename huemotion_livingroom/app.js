@@ -40,9 +40,8 @@ api = new HueApi(hostname, username);
 
 
 sensorTwo.watch(function(err, value) {
-	console.log("Two val"+value);
     if (value==1){
-		console.log("flip on motion two - "+new Date());
+		console.log("Two: motion detected- "+new Date());
 		flipHueTwoOn();
         updateHueTimerTwo();       
     } 
@@ -51,9 +50,8 @@ sensorTwo.watch(function(err, value) {
 
 
 sensorOne.watch(function(err, value) {
-	console.log("One val"+value);
     if (value==1){
-		console.log("flip on motion one - "+new Date());
+		console.log("One: motion detected - "+new Date());
 		flipHueOn();
         updateHueTimer();       
     } 
@@ -61,59 +59,25 @@ sensorOne.watch(function(err, value) {
 
 setInterval(function(){
 	curTime = new Date();
-	console.log("Cur time"+ curTime);
-	console.log("Cur time"+ curTime + "lights off two time"+lightsOffTime);
+	console.log("One: Cur time"+ curTime + "lights off two time"+lightsOffTime);
 	if(curTime > lightsOffTime){
 		flipHueOff();
-		console.log("flipping hue off");
+		console.log("One: flipping hue off" + new Date());
 	}
 }, 8*60*1000);
 
 setInterval(function(){
 	curTime = new Date();
-	console.log("Cur time"+ curTime + "lights off two time"+lightsOffTimeTwo);
+	console.log("Two: Cur time"+ curTime + "lights off two time"+lightsOffTimeTwo);
 	console.log("Lights off time"+lightsOffTimeTwo);
 	if(curTime > lightsOffTimeTwo){
 		flipHueTwoOff();
-		console.log("flipping two hue off");
+		console.log("Two: flipping hue off" + new Date());
 	}
 }, 5*60*1000);
 
 
 
-/*
-var job = new CronJob({
-	cronTime: '00 10 23 * * 0-6',
-	onTick: function() {
-		console.log("cron - " + new Date());
-		flipHueOff();
-		flipHueTwoOff();
-	},
-	start: false,
-	timeZone: 'America/Chicago'
-});
-job.start();
-
-
-var jobTwo = new CronJob({
-	cronTime: '00 10 12 * * 0-6',
-	onTick: function() {
-		console.log("cron - " + new Date());
-		flipHueOff();
-		flipHueTwoOff();
-	},
-	start: false,
-	timeZone: 'America/Chicago'
-});
-jobTwo.start();
-*/
-
-
-/*
-router.get('/', function(req,res){
-    res.send({"status":"200"});        
-});
-*/
 
 var displayResult = function(result) {
     console.log(JSON.stringify(result, null, 2));
@@ -126,7 +90,7 @@ function updateHueTimer(){
 
 function updateHueTimerTwo(){
 	var curTime = new Date();
-	lightsOffTimeTwo = new Date(curTime.getTime() + lightsOffTimeTwo*60*1000);		
+	lightsOffTimeTwo = new Date(curTime.getTime() + lightTimer*60*1000);		
 }
 
 
