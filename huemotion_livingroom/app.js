@@ -26,7 +26,7 @@ console.log('Magic happens on port ' + port +" - "+ new Date());
 
 var lightsOffTime = new Date();
 var lightsOffTimeTwo = new Date();
-var lightTimer = 15;
+var lightTimer = 30;
 
 var HueApi = hue.HueApi;
 var lightState = hue.lightState;
@@ -40,22 +40,40 @@ api = new HueApi(hostname, username);
 
 
 sensorTwo.watch(function(err, value) {
+	curTime = new Date();
     if (value==1){
-		console.log("Two: motion detected- "+new Date());
-		flipHueTwoOn();
-        updateHueTimerTwo();       
+		console.log("Two: motion detected- "+curTime);
+		if(checkTime(curTime)){
+			flipHueTwoOn();
+			updateHueTimerTwo();       	
+		}		
     } 
 });
-
 
 
 sensorOne.watch(function(err, value) {
+	curTime = new Date();
+	
     if (value==1){
-		console.log("One: motion detected - "+new Date());
-		flipHueOn();
-        updateHueTimer();       
+		console.log("One: motion detected - "+curTime);
+		if(checkTime(curTime)){
+			flipHueOn();
+			updateHueTimer();       	
+		}
     } 
 });
+
+
+function checkTime(theTime){
+	var shouldTurnOn = false;
+	if(theTime.d>17){
+		shouldTurnOn = true;
+	} else if(theTime.d<8){
+		shouldTurnOn = true;
+	}
+	return shouldTurnOn;
+	
+}
 
 setInterval(function(){
 	curTime = new Date();
@@ -75,7 +93,6 @@ setInterval(function(){
 		console.log("Two: flipping hue off" + new Date());
 	}
 }, 5*60*1000);
-
 
 
 
@@ -117,7 +134,6 @@ function flipHueTwoOff(){
 
 
 function setLight(hueState){
-	
 	api.setLightState(5, hueState, function(err, lights) {
 	    if (err) throw err;
 	});
@@ -127,8 +143,6 @@ function setLight(hueState){
 	api.setLightState(9, hueState, function(err, lights) {
 	    if (err) throw err;
 	});
-
-
 }
 
 function setLightTwo(hueState){
