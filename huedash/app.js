@@ -3,12 +3,9 @@
 dash_button = require('node-dash-button');
 var dash_br = dash_button("74:c2:46:e8:91:f8"); //address from step above
 var dash_lr = dash_button("10:ae:60:5d:49:cd"); //address from step above
-//c4:e9:84:87:2e:fa
-
+var dash_lr_bright = dash_button("74:75:48:4a:bb:b4");
 
 var hue = require("node-hue-api");
-
-
 var express = require('express');
 var app = express();
 var port = process.env.PORT || 2600;
@@ -32,30 +29,48 @@ var displayError = function(err) {
     console.error(err);
 };
 
-
-
 app.get('/', function(req,res){
     res.send({"status":"200"});
 });
 
 
+var brightCount = 0;
+dash_lr_bright.on("detected", function(){
+	if(brightCount == 0){
+		setHueBrightness(100);
+		brightCount++;
+	} else if(brightCount==1) {
+		setHueBrightness(60);
+		brightCount++;
+	} else {
+		setHueBrightness(30);
+		brightCount=0;
+	}
+});
+
 var countOne=0;
 dash_lr.on("detected", function (){
-
 	if (countOne>9){
 		countOne = 0;
 	}
     setColor(count,"dash_lr");
+    countOne++;
 });
 
 var countTwo=0;
 dash_br.on("detected", function (){
-
 	if (countTwo>9){
 		countTwo = 0;
 	}
     setColor(countTwo,"dash_br");
+    countTwo++;
 });
+
+function setHueBrightness(brightness){
+	console.log("setting brightness");
+	hueState = lightState.create().brightness(brightness).on();
+	setLight(hueState,true);
+}
 
 
 function setColor(count,dashBtn){
@@ -92,15 +107,7 @@ function setColor(count,dashBtn){
 	        break;
 	    default:
 	}
-
-
 }
-
-
-
-
-
-
 
 function setLightFromColor(color,button){
 	var rgb;
@@ -118,7 +125,6 @@ function setLightFromColor(color,button){
     }
     setLight(hueState, isDash_lr);
 }
-
 
 function setLight(hueState, isDash_lr){
     if(isDash_lr){
