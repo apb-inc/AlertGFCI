@@ -10,6 +10,7 @@ var express = require('express');
 var app = express();
 var port = process.env.PORT || 2600;
 var router = express.Router();
+var request = require('request');
 app.listen(port);
 console.log('Magic happens on port ' + port +" - "+ new Date());
 
@@ -46,6 +47,12 @@ dash_lr_bright.on("detected", function(){
 		setHueBrightness(30);
 		brightCount=0;
 	}
+	request('http://192.168.0.111:8080/extend', function (error, response, body) {
+		if (!error && response.statusCode == 200) {
+			console.log(body)
+		}
+    });
+
 });
 
 var countOne=0;
@@ -157,10 +164,7 @@ function setLight(hueState, isDash_lr){
             .then()
             .fail(displayError)
             .done();
-        api.setLightState(4, hueState)
-            .then()
-            .fail(displayError)
-            .done();
+
     }
 
 }
