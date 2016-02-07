@@ -63,12 +63,18 @@ sensorOne.watch(function(err, value) {
     } 
 });
 
+router.get('/extend', function(req,res){
+	console.log("updating hue timer via extend"+new Date());
+	curTime = new Date();
+	lightsOffTime = new Date(curTime.getTime() + lightTimer*60*1000);		
+    res.send({"status":"200"});        
+});
 
 function checkTime(theTime){
 	var shouldTurnOn = false;
-	if(theTime.d>17){
+	if(theTime.getHours()>=16){
 		shouldTurnOn = true;
-	} else if(theTime.d<8){
+	} else if(theTime.getHours()<8){
 		shouldTurnOn = true;
 	}
 	return shouldTurnOn;
