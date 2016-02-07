@@ -3,7 +3,7 @@
 dash_button = require('node-dash-button');
 var dash_br = dash_button("74:c2:46:e8:91:f8"); //address from step above
 var dash_lr = dash_button("10:ae:60:5d:49:cd"); //address from step above
-
+//c4:e9:84:87:2e:fa
 
 
 var hue = require("node-hue-api");
@@ -39,57 +39,13 @@ app.get('/', function(req,res){
 });
 
 
-var count=0;
+var countOne=0;
 dash_lr.on("detected", function (){
 
-	if (count>9){
-		count = 0;
+	if (countOne>9){
+		countOne = 0;
 	}
-	console.log("count"+count);
-	switch(count) {
-	    case 0:
-			setLightFromColor("152,0,0", "dash_lr");
-			count++;
-	        break;
-	    case 1:
-			setLightFromColor("255,0,0", "dash_lr");
-			count++;
-	        break;
-	    case 2:
-			setLightFromColor("255,153,0", "dash_lr");
-			count++;
-	        break;
-	    case 3:
-			setLightFromColor("255,255,0", "dash_lr");
-			count++;
-	        break;
-	    case 4:
-			setLightFromColor("0,255,0", "dash_lr");
-			count++;
-	        break;
-	    case 5:
-			setLightFromColor("74,134,232", "dash_lr");
-			count++;
-	        break;
-	    case 6:
-			setLightFromColor("0,0,255", "dash_lr");
-			count++;
-	        break;
-	    case 7:
-			setLightFromColor("153,0,255", "dash_lr");
-			count++;
-	        break;
-	    case 8:
-			setLightFromColor("255,0,255", "dash_lr");
-			count++;
-	        break;
-	    case 9:
-			setLightFromColor("255,255,255", "dash_lr");
-			count++;
-	        break;
-	    default:
-	}
-
+    setColor(count,"dash_lr");
 });
 
 var countTwo=0;
@@ -98,53 +54,47 @@ dash_br.on("detected", function (){
 	if (countTwo>9){
 		countTwo = 0;
 	}
-	console.log("count"+countTwo);
-	switch(countTwo) {
+    setColor(countTwo,"dash_br");
+});
+
+
+function setColor(count,dashBtn){
+	switch(count) {
 	    case 0:
-			setLightFromColor("152,0,0","dash_br");
-			countTwo++;
+			setLightFromColor("152,0,0",dashBtn);
 	        break;
 	    case 1:
-			setLightFromColor("255,0,0","dash_br");
-			countTwo++;
+			setLightFromColor("255,0,0",dashBtn);
 	        break;
 	    case 2:
-			setLightFromColor("255,153,0","dash_br");
-			countTwo++;
+			setLightFromColor("255,153,0",dashBtn);
 	        break;
 	    case 3:
-			setLightFromColor("255,255,0","dash_br");
-			countTwo++;
+			setLightFromColor("255,255,0",dashBtn);
 	        break;
 	    case 4:
-			setLightFromColor("0,255,0","dash_br");
-			countTwo++;
+			setLightFromColor("0,255,0",dashBtn);
 	        break;
 	    case 5:
-			setLightFromColor("74,134,232","dash_br");
-			countTwo++;
+			setLightFromColor("74,134,232",dashBtn);
 	        break;
 	    case 6:
-			setLightFromColor("0,0,255","dash_br");
-			countTwo++;
+			setLightFromColor("0,0,255",dashBtn);
 	        break;
 	    case 7:
-			setLightFromColor("153,0,255","dash_br");
-			countTwo++;
+			setLightFromColor("153,0,255",dashBtn);
 	        break;
 	    case 8:
-			setLightFromColor("255,0,255","dash_br");
-			countTwo++;
+			setLightFromColor("255,0,255",dashBtn);
 	        break;
 	    case 9:
-			setLightFromColor("255,255,255","dash_br");
-			countTwo++;
+			setLightFromColor("255,255,255",dashBtn);
 	        break;
 	    default:
 	}
 
-});
 
+}
 
 
 
