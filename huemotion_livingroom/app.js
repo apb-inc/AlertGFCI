@@ -43,10 +43,8 @@ sensorTwo.watch(function(err, value) {
 	curTime = new Date();
     if (value==1){
 		console.log("Two: motion detected- "+curTime);
-		if(checkTime(curTime)){
-			flipHueTwoOn();
-			updateHueTimerTwo();       	
-		}		
+		flipHueTwoOn();
+		updateHueTimerTwo();       	
     } 
 });
 
@@ -107,12 +105,12 @@ var displayResult = function(result) {
 };
 
 function updateHueTimer(){
-	var curTime = new Date();
+	curTime = new Date();
 	lightsOffTime = new Date(curTime.getTime() + lightTimer*60*1000);		
 }
 
 function updateHueTimerTwo(){
-	var curTime = new Date();
+	curTime = new Date();
 	lightsOffTimeTwo = new Date(curTime.getTime() + lightTimer*60*1000);		
 }
 
