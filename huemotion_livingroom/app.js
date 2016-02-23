@@ -26,7 +26,7 @@ console.log('Magic happens on port ' + port +" - "+ new Date());
 
 var lightsOffTime = new Date();
 var lightsOffTimeTwo = new Date();
-var lightTimer = 15;
+var lightTimer = 30;
 
 var HueApi = hue.HueApi;
 var lightState = hue.lightState;
@@ -40,88 +40,77 @@ api = new HueApi(hostname, username);
 
 
 sensorTwo.watch(function(err, value) {
-	console.log("Two val"+value);
+	curTime = new Date();
     if (value==1){
-		console.log("flip on motion two - "+new Date());
+		console.log("Two: motion detected- "+curTime);
 		flipHueTwoOn();
-        updateHueTimerTwo();       
+		updateHueTimerTwo();       	
     } 
 });
-
 
 
 sensorOne.watch(function(err, value) {
-	console.log("One val"+value);
+	curTime = new Date();
+	
     if (value==1){
-		console.log("flip on motion one - "+new Date());
-		flipHueOn();
-        updateHueTimer();       
+		console.log("One: motion detected - "+curTime);
+		if(checkTime(curTime)){
+			flipHueOn();
+			updateHueTimer();       	
+		}
     } 
 });
 
-setInterval(function(){
+router.get('/extend', function(req,res){
+	console.log("updating hue timer via extend"+new Date());
 	curTime = new Date();
-	console.log("Cur time"+ curTime);
-	console.log("Lights off time"+lightsOffTime);
-	if(curTime > lightsOffTime){
-		flipHueOff();
-		console.log("flipping hue off");
-	}
-}, 5*60*1000);
-
-setInterval(function(){
-	curTime = new Date();
-	console.log("Cur time"+ curTime);
-	console.log("Lights off time"+lightsOffTimeTwo);
-	if(curTime > lightsOffTime){
-		flipHueTwoOff();
-		console.log("flipping hue off");
-	}
-}, 5*60*1000);
-
-
-
-var job = new CronJob({
-	cronTime: '00 10 23 * * 0-6',
-	onTick: function() {
-		console.log("cron - " + new Date());
-		flipHueOff();
-		flipHueTwoOff();
-	},
-	start: false,
-	timeZone: 'America/Chicago'
-});
-job.start();
-
-
-var jobTwo = new CronJob({
-	cronTime: '00 10 12 * * 0-6',
-	onTick: function() {
-		console.log("cron - " + new Date());
-		flipHueOff();
-		flipHueTwoOff();
-	},
-	start: false,
-	timeZone: 'America/Chicago'
-});
-jobTwo.start();
-
-
-router.get('/', function(req,res){
+	lightsOffTime = new Date(curTime.getTime() + lightTimer*60*1000);		
     res.send({"status":"200"});        
 });
+
+function checkTime(theTime){
+	var shouldTurnOn = false;
+	if(theTime.getHours()>=16){
+		shouldTurnOn = true;
+	} else if(theTime.getHours()<8){
+		shouldTurnOn = true;
+	}
+	return shouldTurnOn;
+	
+}
+
+setInterval(function(){
+	curTime = new Date();
+	console.log("One: Cur time"+ curTime + "lights off two time"+lightsOffTime);
+	if(curTime > lightsOffTime){
+		flipHueOff();
+		console.log("One: flipping hue off" + new Date());
+	}
+}, 8*60*1000);
+
+setInterval(function(){
+	curTime = new Date();
+	console.log("Two: Cur time"+ curTime + "lights off two time"+lightsOffTimeTwo);
+	console.log("Lights off time"+lightsOffTimeTwo);
+	if(curTime > lightsOffTimeTwo){
+		flipHueTwoOff();
+		console.log("Two: flipping hue off" + new Date());
+	}
+}, 5*60*1000);
+
+
 
 var displayResult = function(result) {
     console.log(JSON.stringify(result, null, 2));
 };
 
 function updateHueTimer(){
-	var curTime = new Date();
+	curTime = new Date();
 	lightsOffTime = new Date(curTime.getTime() + lightTimer*60*1000);		
 }
 
 function updateHueTimerTwo(){
-	var curTime = new Date();
+	curTime = new Date();
 	lightsOffTimeTwo = new Date(curTime.getTime() + lightTimer*60*1000);		
 }
 
@@ -149,21 +138,21 @@ function flipHueTwoOff(){
 
 
 function setLight(hueState){
-    api.setLightState(5, hueState)
-        .then()
-        .done();
-    api.setLightState(6, hueState)
-        .then()
-        .done(); 
-    api.setLightState(9, hueState)
-        .then()
-        .done();  
+	api.setLightState(5, hueState, function(err, lights) {
+	    if (err) throw err;
+	});
+	api.setLightState(6, hueState, function(err, lights) {
+	    if (err) throw err;
+	});
+	api.setLightState(9, hueState, function(err, lights) {
+	    if (err) throw err;
+	});
 }
 
 function setLightTwo(hueState){
-	api.setLightState(7, hueState)
-        .then()
-        .done(); 
+	api.setLightState(7, hueState, function(err, lights) {
+	    if (err) throw err;
+	});
 }
 
 

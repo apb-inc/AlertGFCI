@@ -4,13 +4,14 @@ var bodyParser = require('body-parser');
 var nodemailer = require('nodemailer');
 var request = require('request');
 var Gpio = require('onoff').Gpio;
-var sensor = new Gpio(14, 'in','both');
+var sensorOne = new Gpio(14, 'in','both');
+var sensorTwo = new Gpio(21, 'in','both');
 var hue = require("node-hue-api");
-
+var CronJob = require('cron').CronJob;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-var port = process.env.PORT || 2601;
+var port = process.env.PORT || 8080;
 var router = express.Router();
 // Route settings
 app.use('/', router);
@@ -33,13 +34,22 @@ var hostname = "192.168.0.103",
 
 api = new HueApi(hostname, username);
 
-sensor.watch(function(err, value) {
+sensorOne.watch(function(err, value) {
     if (value==1){
-	console.log("flip on"+new Date());
+	console.log("flip on sensor one"+new Date());
 	    flipHueOn();
         updateHueTimer();       
     } 
 });
+
+sensorTwo.watch(function(err, value) {
+    if (value==1){
+	console.log("flip on sensor two"+new Date());
+	    flipHueOn();
+        updateHueTimer();       
+    } 
+});
+
 
 setInterval(function(){
 	curTime = new Date();
@@ -51,30 +61,6 @@ setInterval(function(){
 
 }, 5*60*1000);
 
-router.get('/', function(req,res){
-    res.send({"status":"200"});        
-});
-
-router.get('/extend', function(req,res){
-	console.log("updating hue timer via extend"+new Date());
-	curTime = new Date();
-	lightsOffTime = new Date(curTime.getTime() + 15*60*1000);		
-    res.send({"status":"200"});        
-});
-
-router.get('/reset', function(req,res){
-	console.log("updating hue timer via reset"+new Date());
-	curTime = new Date();
-	lightsOffTime = new Date(curTime.getTime() + 2*60*100);		
-    res.send({"status":"200"});        
-});
-
-
-
-
-var displayResult = function(result) {
-    console.log(JSON.stringify(result, null, 2));
-};
 
 function updateHueTimer(){
 	console.log("updating hue timer"+new Date());
@@ -85,33 +71,29 @@ function updateHueTimer(){
 
 function flipHueOn(){
 	hueState = lightState.create().on();
-	setLight(hueState,false);
+	setLight(hueState);
 }
 
 function flipHueOff(){
 	hueState = lightState.create().off();
-	setLight(hueState,true);
+	setLight(hueState);
 }
 
-function setLight(hueState,isFloat){
-    api.setLightState(1, hueState)
+function setLight(hueState){
+    api.setLightState(5, hueState)
         .then()
         .done();
     
-    api.setLightState(2, hueState)
+    api.setLightState(6, hueState)
         .then()
         .done();
         
-    api.setLightState(3, hueState)
+    api.setLightState(9, hueState)
         .then()
         .done();    
         
-    if(isFloat){
-		api.setLightState(8, hueState)
-		    .then()
-		    .done();            
-    }
+	api.setLightState(7, hueState)
+	    .then()
+	    .done();            
         
 }
-
-
