@@ -26,7 +26,7 @@ console.log('Magic happens on port ' + port +" - "+ new Date());
 
 var lightsOffTime = new Date();
 var lightsOffTimeTwo = new Date();
-var lightTimer = 15;
+var lightTimer = 30;
 
 var HueApi = hue.HueApi;
 var lightState = hue.lightState;
@@ -40,22 +40,44 @@ api = new HueApi(hostname, username);
 
 
 sensorTwo.watch(function(err, value) {
+	curTime = new Date();
     if (value==1){
-		console.log("Two: motion detected- "+new Date());
+		console.log("Two: motion detected- "+curTime);
 		flipHueTwoOn();
-        updateHueTimerTwo();       
+		updateHueTimerTwo();       	
     } 
 });
-
 
 
 sensorOne.watch(function(err, value) {
+	curTime = new Date();
+	
     if (value==1){
-		console.log("One: motion detected - "+new Date());
-		flipHueOn();
-        updateHueTimer();       
+		console.log("One: motion detected - "+curTime);
+		if(checkTime(curTime)){
+			flipHueOn();
+			updateHueTimer();       	
+		}
     } 
 });
+
+router.get('/extend', function(req,res){
+	console.log("updating hue timer via extend"+new Date());
+	curTime = new Date();
+	lightsOffTime = new Date(curTime.getTime() + lightTimer*60*1000);		
+    res.send({"status":"200"});        
+});
+
+function checkTime(theTime){
+	var shouldTurnOn = false;
+	if(theTime.getHours()>=16){
+		shouldTurnOn = true;
+	} else if(theTime.getHours()<8){
+		shouldTurnOn = true;
+	}
+	return shouldTurnOn;
+	
+}
 
 setInterval(function(){
 	curTime = new Date();
@@ -78,18 +100,17 @@ setInterval(function(){
 
 
 
-
 var displayResult = function(result) {
     console.log(JSON.stringify(result, null, 2));
 };
 
 function updateHueTimer(){
-	var curTime = new Date();
+	curTime = new Date();
 	lightsOffTime = new Date(curTime.getTime() + lightTimer*60*1000);		
 }
 
 function updateHueTimerTwo(){
-	var curTime = new Date();
+	curTime = new Date();
 	lightsOffTimeTwo = new Date(curTime.getTime() + lightTimer*60*1000);		
 }
 
@@ -117,7 +138,6 @@ function flipHueTwoOff(){
 
 
 function setLight(hueState){
-	
 	api.setLightState(5, hueState, function(err, lights) {
 	    if (err) throw err;
 	});
@@ -127,8 +147,6 @@ function setLight(hueState){
 	api.setLightState(9, hueState, function(err, lights) {
 	    if (err) throw err;
 	});
-
-
 }
 
 function setLightTwo(hueState){
