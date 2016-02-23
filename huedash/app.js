@@ -60,7 +60,7 @@ dash_lr.on("detected", function (){
 	if (countOne>9){
 		countOne = 0;
 	}
-    setColor(count,"dash_lr");
+    setColor(countOne,"dash_lr");
     countOne++;
 });
 
