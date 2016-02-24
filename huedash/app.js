@@ -151,6 +151,10 @@ function setLight(hueState, isDash_lr){
             .then()
             .fail(displayError)
             .done();
+		api.setLightState(11, hueState)
+			.then()
+			.fail(displayError)
+			.done();
     } else {
         api.setLightState(1, hueState)
             .then()

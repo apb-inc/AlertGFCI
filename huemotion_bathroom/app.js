@@ -70,6 +70,10 @@ router.get('/reset', function(req,res){
 });
 
 
+var displayError = function(err) {
+    console.error(err);
+};
+
 
 
 var displayResult = function(result) {
@@ -96,19 +100,23 @@ function flipHueOff(){
 function setLight(hueState,isFloat){
     api.setLightState(1, hueState)
         .then()
+        .fail(displayError)
         .done();
     
     api.setLightState(2, hueState)
         .then()
+		.fail(displayError)
         .done();
         
     api.setLightState(3, hueState)
         .then()
+        .fail(displayError)
         .done();    
         
     if(isFloat){
 		api.setLightState(8, hueState)
 		    .then()
+			.fail(displayError)
 		    .done();            
     }
         
