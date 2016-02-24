@@ -39,6 +39,7 @@ var hostname = "192.168.0.103",
 api = new HueApi(hostname, username);
 
 
+
 sensorTwo.watch(function(err, value) {
 	curTime = new Date();
     if (value==1){
@@ -146,6 +147,9 @@ function setLight(hueState){
 	});
 	api.setLightState(9, hueState, function(err, lights) {
 	    if (err) throw err;
+	});
+	api.setLightState(11, hueState, function(err, lights){
+		if(err) throw err;
 	});
 }
 
