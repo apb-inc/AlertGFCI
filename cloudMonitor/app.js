@@ -13,7 +13,9 @@ var router = express.Router();
 // Route settings
 app.use('/', router);
 app.listen(port);
-console.log('Magic happens on port ' + port +" - "+ new Date());
+var currentTimeo = new Date();
+currentTimeo = new Date(currentTimeo.getTime()-60*60*1000);   
+console.log('Magic happens on port ' + port +" - "+ currentTimeo);
 
 var healthCheckMins = 30;
 var needToSend = true;
