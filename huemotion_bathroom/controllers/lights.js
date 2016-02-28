@@ -9,6 +9,12 @@ var hostname = "192.168.0.103",
 
 api = new HueApi(hostname, username);
 
+var displayError = function(err) {
+    console.error(err);
+};
+var displayResult = function(result) {
+    console.log(JSON.stringify(result, null, 2));
+};
 
 
 function setLightFromColor(color){
@@ -24,10 +30,10 @@ function setLightFromColor(color){
     set(hueState);
 }
 
-function setHueBrightness(brightness, allLightsOn){
+function setHueBrightness(brightness, allLights){
 	console.log("setting brightness");
 	hueState = lightState.create().brightness(brightness).on();
-	set(hueState,allLightsOn);
+	set(hueState,allLights);
 }
 
 
@@ -41,6 +47,25 @@ function flipHueOff(){
 	hueState = lightState.create().off();
 	set(hueState,true);
 };
+
+function turnLampOn(){
+	hueState = lightState.create().brightness(100).on();
+	setLampState(hueState);
+}
+
+function turnLampOff(){
+	console.log("Turning lamp off");
+	hueState = lightState.create().off();
+	setLampState(hueState);
+}
+
+function setLampState(hueState){
+    api.setLightState(10, hueState)
+	    .then()
+	    .fail(displayError)
+	    .done();	
+}
+
 
 function set(hueState,allLightsOn){
     api.setLightState(1, hueState)
@@ -70,3 +95,8 @@ function set(hueState,allLightsOn){
 module.exports.set = set;
 module.exports.flipHueOff = flipHueOff;
 module.exports.flipHueOn = flipHueOn;
+module.exports.setLightFromColor = setLightFromColor;
+module.exports.turnLampOff = turnLampOff;
+module.exports.setHueBrightness = setHueBrightness;
+module.exports.turnLampOn = turnLampOn;
+module.exports.turnLampOff = turnLampOff;

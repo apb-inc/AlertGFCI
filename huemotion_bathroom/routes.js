@@ -9,39 +9,24 @@ module.exports = (function() {
 	
 	router.post('/startFloat', function(req,res){
 		var floatTime = req.body.floatTime;
-		var preFloatColor = req.body.preFloatColor;
-		var postFloatColor = req.body.postFloatColor;
-		Float.start(floatTime, preFloatColor, postFloatColor);
+		var preColor = req.body.preColor;
+		var postColor = req.body.postColor;
+		var hueTimeShowerFlash = req.body.hueTimeShowerFlash;
+		Float.start(floatTime, preColor, postColor, hueTimeShowerFlash);
 		
 		
-		if(floatTime&&preFloatColor&&postFloatColor){
+		if(floatTime&&preColor&&postColor&&hueTimeShowerFlash){
             res.send("Success");
         } else {
             res.send("Fail please supply all argumenets");
         }
 		
 	});
-	
-	router.get('/extend', function(req,res){
-		console.log("updating hue timer via extend"+new Date());
-		curTime = new Date();
-		lightsOffTime = new Date(curTime.getTime() + 15*60*1000);		
-	    res.send({"status":"200"});        
-	});
-	
+		
 	router.get('/motionAfterFloat', function(req,res){
 		Float.motionAfterFloat();
 	    res.send({"status":"200"});        
-	});
-	
-	
-	router.get('/reset', function(req,res){
-		console.log("updating hue timer via reset"+new Date());
-		curTime = new Date();
-		lightsOffTime = new Date(curTime.getTime() + 2*60*100);		
-	    res.send({"status":"200"});        
-	});
-		
+	});		
 		
 	router.get('/endFloat', function(req,res){
 		Float.endFloat();

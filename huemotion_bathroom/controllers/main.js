@@ -1,13 +1,13 @@
-var sensor_br = new Gpio(14, 'in','both');
-var sensor_fr = new Gpio(26, 'in','both');
 var Gpio = require('onoff').Gpio;
+var sensor_br = new Gpio(14, 'in','both');
+var sensor_fr = new Gpio(21, 'in','both');
 
 var lightsOffTime = new Date();
 var lightTimer = 20;
 var curTime;
 
 
-var Lights = require('./controllers/lights.js');
+var lights = require('./lights.js');
 
 
 
@@ -16,8 +16,9 @@ exports.start = function(){
 		var allLightsOn = false;
 	
 	    if (value==1){
-		console.log("Flip on from bathroom sensor"+new Date());
-		    flipHueOn(allLightsOn);
+		    console.log("-----------------------------------------------------------------");
+			console.log("Flip on from bathroom sensor"+new Date());
+		    lights.flipHueOn(allLightsOn);
 	        updateHueTimer(20);       
 	    } 
 	});
@@ -25,8 +26,9 @@ exports.start = function(){
 	sensor_fr.watch(function(err, value) {
 		var allLightsOn = true;
 	    if (value==1){
-		console.log("Flip on from float room sensor"+new Date());
-		    Lights.FlipHueOn(allLightsOn);
+		    console.log("-----------------------------------------------------------------");
+			console.log("Flip on from float room sensor"+new Date());
+		    lights.flipHueOn(allLightsOn);
 	        updateHueTimer(5);       
 	    } 
 	});
@@ -36,20 +38,11 @@ exports.start = function(){
 		console.log("curtime"+ curTime+"light off"+lightsOffTime)
 		if(curTime > lightsOffTime){
 			console.log("Flip off" + new Date());
-			Lights.flipHueOff();
+			lights.flipHueOff();
 		}
 	}, 1*60*1000);	
 };
 
-
-var displayError = function(err) {
-    console.error(err);
-};
-
-
-var displayResult = function(result) {
-    console.log(JSON.stringify(result, null, 2));
-};
 
 function updateHueTimer(time){
 	console.log("updating hue timer"+new Date());
