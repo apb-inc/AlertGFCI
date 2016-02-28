@@ -56,3 +56,4 @@ function updateHueTimer(time){
 
 
 
+module.exports.updateHueTimer = updateHueTimer;

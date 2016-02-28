@@ -19,19 +19,18 @@ var displayResult = function(result) {
 
 function setLightFromColor(color){
 	var rgb;
+	var allLightsOn = true
     rgb = color.split(",");
-    console.log("Setting color to "+color);
     console.log(rgb);
     var r=parseInt(rgb[0],10);
     var g=parseInt(rgb[1],10);
     var b=parseInt(rgb[2],10);
     hueState = lightState.create().rgb(r,g,b);
     hueState.on();
-    set(hueState);
+    set(hueState,allLightsOn);
 }
 
 function setHueBrightness(brightness, allLights){
-	console.log("setting brightness");
 	hueState = lightState.create().brightness(brightness).on();
 	set(hueState,allLights);
 }
@@ -49,21 +48,22 @@ function flipHueOff(){
 };
 
 function turnLampOn(){
-	hueState = lightState.create().brightness(100).on();
+	hueState = lightState.create().on();
 	setLampState(hueState);
 }
 
 function turnLampOff(){
-	console.log("Turning lamp off");
 	hueState = lightState.create().off();
 	setLampState(hueState);
 }
 
 function setLampState(hueState){
-    api.setLightState(10, hueState)
-	    .then()
-	    .fail(displayError)
-	    .done();	
+	setTimeout(function(){
+		api.setLightState(10, hueState)
+		    .then(displayResult)
+		    .fail(displayError)
+		    .done();	
+	}, .2*60*1000)
 }
 
 

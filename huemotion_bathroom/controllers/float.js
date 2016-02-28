@@ -1,4 +1,6 @@
 var lights = require('./lights.js');
+var main = require('./main.js');
+
 var hueTimeShowerFlash = 5;
 
 
@@ -20,9 +22,9 @@ exports.start = function(floatTime, preColor, postColor, hueTimeShowerFlash){
 	lights.setLightFromColor(preColor);
 	lights.setHueBrightness(100,allLights);
 	flashLightsDuringShower(preColor);
-	console.log("floattimeis",floatTime);
+	lights.turnLampOff();
 	setTimeout(function(){
-		console.log("Float over"+new Date());
+		main.updateHueTimer(20);       
 		lights.setLightFromColor(postColor);
 		lights.setHueBrightness(100,allLights);
 		lights.turnLampOn();
@@ -32,6 +34,7 @@ exports.start = function(floatTime, preColor, postColor, hueTimeShowerFlash){
 };
 
 exports.motionAfterFloat = function(){
+	console.log("motion after float");
 	allLightsOn = false;
 	lights.setHueBrightness(35,allLightsOn);
 	lights.turnLampOff();
@@ -39,7 +42,6 @@ exports.motionAfterFloat = function(){
 
 
 function flashLightsDuringShower(preColor){
-	console.log("Will flashing lights during shower:" + new Date());
 	setTimeout(function(){
 	    lights.setLightFromColor("255,255,255");
 		lights.setHueBrightness(50);
