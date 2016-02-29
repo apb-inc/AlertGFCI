@@ -3,7 +3,7 @@ var sensor_br = new Gpio(14, 'in','both');
 var sensor_fr = new Gpio(21, 'in','both');
 
 var lightsOffTime = new Date();
-var lightTimer = 20;
+var lightTimer = 25;
 var curTime;
 
 
