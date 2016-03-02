@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var request = require('request');
-var port = process.env.PORT || 8080;
+var port = process.env.PORT || 2600;
 var router = express.Router();
 // Route settings
 app.use('/', router);

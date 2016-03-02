@@ -31,16 +31,11 @@ var services = [
     }
 ];
 
-console.log("ye");
-
 setInterval(function(){
-    console.log("checck");
-
     for (var i=0;i<services.length;i++){
-        console.log("checking"+services[i].name);
         checkServiceHealth(services[i].name,services[i].ip);
     }
-}, 5000);
+}, 2000);
 
 
 function serviceObjectFromName(serviceName){
@@ -54,16 +49,17 @@ function sendEmail(content){
 
 function sendAlert(serviceObj, isOnline){
     var needsToSend = serviceObj.needsToSend;
-    if(needsToSend){
+    console.log("needs to send "+needsToSend+" isonline "+isOnline);
         if(isOnline){
             console.log(serviceObj.name+" server is back online at: "+ new Date());
             sendEmail(new Date()+serviceObj.name+" is online!");
-        } else {
+            serviceObj.needsToSend = true;
+        } else if(needsToSend) {
             console.log(serviceObj.name+" server has went offline at: "+ new Date());
             sendEmail(new Date()+serviceObj.name+" is offline!");
+            serviceObj.needsToSend = false;
         }
-        needsToSend = false;
-    }
+
 }
 
 
@@ -72,17 +68,17 @@ function checkServiceHealth(name,ip){
     request(ip, function (error, response, body) {
         var serviceObj = serviceObjectFromName(name);
         var isOnline = serviceObj.isOnline;
-        console.log(error);
         if(error){
-            console.log("ERRRRRR");
-            isOnline = false;
-            sendAlert(serviceObj,isOnline);
-            serviceObj.needsToSend = false;
+            serviceObj.isOnline = false;
+            sendAlert(serviceObj,false);
         } else {
+            console.log("online");
             //Is online again check to make sure it was previously offline before sending online alert
-            if(!isOnline){
-                isOnline = true;
-                sendAlert(serviceObj,isOnline);
+            console.log(serviceObj.isOnline);
+            if(!serviceObj.isOnline){
+                console.log("about to send");
+                serviceObj.isOnline = true;
+                sendAlert(serviceObj,serviceObj.isOnline);
             }
         }
     });
