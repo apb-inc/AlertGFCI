@@ -105,6 +105,11 @@ var displayResult = function(result) {
     console.log(JSON.stringify(result, null, 2));
 };
 
+api.lights()
+    .then(displayResult)
+    .done();
+
+
 function updateHueTimer(){
 	curTime = new Date();
 	lightsOffTime = new Date(curTime.getTime() + lightTimer*60*1000);		
@@ -149,6 +154,9 @@ function setLight(hueState){
 	    if (err) throw err;
 	});
 	api.setLightState(11, hueState, function(err, lights){
+		if(err) throw err;
+	});
+	api.setLightState(12, hueState, function(err, lights){
 		if(err) throw err;
 	});
 }
