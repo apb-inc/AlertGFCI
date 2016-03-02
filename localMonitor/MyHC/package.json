@@ -1,0 +1,10 @@
+{
+    "name": "MyHC",
+    "description": "My Health Check",
+    "version": "0.0.1",
+    "main": "app.js",
+    "dependencies": {
+        "express": "4.13.3",
+		"request": "2.69.0"
+    }
+}
