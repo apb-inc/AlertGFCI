@@ -14,8 +14,8 @@ router.get('/', function(req,res){
 
 var services = [
     {
-        name:"Holka",
-        ip:"127.0.0.1:2602",
+        name:"Local Monitor",
+        ip:"http://127.0.0.1:2600",
         alertNumbers:"555-555-5555",
         alertEmails:"me@gmail.com,you@gmail.com",
         isOnline:true,
@@ -23,7 +23,7 @@ var services = [
     },
     {
         name:"Test",
-        ip:"127.0.0.1:2602",
+        ip:"http://127.0.0.1:8081",
         alertNumbers:"555-555-5555",
         alertEmails:"me@gmail.com,you@gmail.com",
         isOnline:true,
@@ -37,10 +37,10 @@ setInterval(function(){
     console.log("checck");
 
     for (var i=0;i<services.length;i++){
-        console.log("checking");
+        console.log("checking"+services[i].name);
         checkServiceHealth(services[i].name,services[i].ip);
     }
-}, 1000);
+}, 5000);
 
 
 function serviceObjectFromName(serviceName){
@@ -68,19 +68,22 @@ function sendAlert(serviceObj, isOnline){
 
 
 function checkServiceHealth(name,ip){
+    console.log("Checking health",name,ip);
     request(ip, function (error, response, body) {
         var serviceObj = serviceObjectFromName(name);
         var isOnline = serviceObj.isOnline;
+        console.log(error);
         if(error){
+            console.log("ERRRRRR");
             isOnline = false;
             sendAlert(serviceObj,isOnline);
+            serviceObj.needsToSend = false;
         } else {
             //Is online again check to make sure it was previously offline before sending online alert
             if(!isOnline){
                 isOnline = true;
                 sendAlert(serviceObj,isOnline);
             }
-            serviceObj.needsToSend = true;
         }
     });
 }
