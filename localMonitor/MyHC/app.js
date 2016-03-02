@@ -48,17 +48,16 @@ function sendEmail(content){
 }
 
 function sendAlert(serviceObj, isOnline){
-    var needsToSend = serviceObj.needsToSend;
     var serviceName = serviceObj.name;
-    console.log("needs to send "+needsToSend+" isonline "+isOnline);
+    console.log("needs to send "+serviceObj.needsToSend+" isonline "+isOnline);
         if(isOnline){
             console.log(serviceName+" server is back online at: "+ new Date());
             sendEmail(new Date()+serviceName+" is online!");
-            needsToSend = true;
-        } else if(needsToSend) {
+            serviceObj.needsToSend = true;
+        } else if(serviceObj.needsToSend) {
             console.log(serviceName+" server has went offline at: "+ new Date());
             sendEmail(new Date()+serviceName+" is offline!");
-            needsToSend = false;
+            serviceObj.needsToSend = false;
         }
 
 }
@@ -68,18 +67,17 @@ function checkServiceHealth(name,ip){
     console.log("Checking health",name,ip);
     request(ip, function (error, response, body) {
         var serviceObj = serviceObjectFromName(name);
-        var isOnline = serviceObj.isOnline;
         if(error){
-             = false;
+            serviceObj.isOnline = false;
             sendAlert(serviceObj,false);
         } else {
             console.log("online");
             //Is online again check to make sure it was previously offline before sending online alert
             console.log();
-            if(!isOnline){
+            if(!serviceObj.isOnline){
                 console.log("about to send");
-                 = true;
-                sendAlert(serviceObj,);
+                serviceObj.isOnline = true;
+                sendAlert(serviceObj,serviceObj.isOnline);
             }
         }
     });
