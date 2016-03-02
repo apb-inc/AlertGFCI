@@ -49,15 +49,16 @@ function sendEmail(content){
 
 function sendAlert(serviceObj, isOnline){
     var needsToSend = serviceObj.needsToSend;
+    var serviceName = serviceObj.name;
     console.log("needs to send "+needsToSend+" isonline "+isOnline);
         if(isOnline){
-            console.log(serviceObj.name+" server is back online at: "+ new Date());
-            sendEmail(new Date()+serviceObj.name+" is online!");
-            serviceObj.needsToSend = true;
+            console.log(serviceName+" server is back online at: "+ new Date());
+            sendEmail(new Date()+serviceName+" is online!");
+            needsToSend = true;
         } else if(needsToSend) {
-            console.log(serviceObj.name+" server has went offline at: "+ new Date());
-            sendEmail(new Date()+serviceObj.name+" is offline!");
-            serviceObj.needsToSend = false;
+            console.log(serviceName+" server has went offline at: "+ new Date());
+            sendEmail(new Date()+serviceName+" is offline!");
+            needsToSend = false;
         }
 
 }
@@ -69,16 +70,16 @@ function checkServiceHealth(name,ip){
         var serviceObj = serviceObjectFromName(name);
         var isOnline = serviceObj.isOnline;
         if(error){
-            serviceObj.isOnline = false;
+             = false;
             sendAlert(serviceObj,false);
         } else {
             console.log("online");
             //Is online again check to make sure it was previously offline before sending online alert
-            console.log(serviceObj.isOnline);
-            if(!serviceObj.isOnline){
+            console.log();
+            if(!isOnline){
                 console.log("about to send");
-                serviceObj.isOnline = true;
-                sendAlert(serviceObj,serviceObj.isOnline);
+                 = true;
+                sendAlert(serviceObj,);
             }
         }
     });
