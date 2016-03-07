@@ -45,20 +45,17 @@ function sendMessage(content){
         if (!error && response.statusCode == 200) {
             console.log(body);
         } else {
-            console.log("failed",error,response);
-            sendEmail();
+            console.log(new Date()+"failed to text",error);
+            sendEmail(content);
         }
     });
-
-
     console.log(content);
 }
 
 
-function sendEmail(email,type){
-    var emailContent = "";
+function sendEmail(content){
     var currentTime = new Date();
-
+    console.log(currentTime+"sending email");
     var transporter = nodemailer.createTransport({
         service: 'Gmail',
         auth: {
@@ -68,9 +65,9 @@ function sendEmail(email,type){
     });
     var mailOptions = {
         from: loginInfo.fromEmail,
-        to: email,
+        to: loginInfo.toEmail,
         subject: 'Floatee update!',
-        text: emailContent
+        text: content
     };
     transporter.sendMail(mailOptions, function(error, info){
         if(error){
@@ -80,9 +77,6 @@ function sendEmail(email,type){
     });
 }
 
-function sendEmail(content){
-
-}
 
 function sendAlert(serviceObj, isOnline){
     var serviceName = serviceObj.name;
