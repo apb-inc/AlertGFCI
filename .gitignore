@@ -8,3 +8,5 @@
 node_modules
 log.txt
 services.js
+loginInfo.js
+logininfo.js
