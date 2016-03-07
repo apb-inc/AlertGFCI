@@ -13,7 +13,7 @@ console.log('Magic happens on port ' + port +" - "+ new Date());
 router.get('/', function(req,res){
     res.send({"status":"200"});
 });
-var services = require('./services.js');
+var services = require('./source/servicesInfo.js');
 
 
 for (var i=0;i<services.length;i++){
