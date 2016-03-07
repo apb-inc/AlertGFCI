@@ -38,16 +38,17 @@ function sendMessage(content){
 
     //Check if Twilio is online if offline use Node mailer
 
-	// request.post({
-    //       url:	serverInfo.twilioSendServer,
-    //       form: { toNumber: loginInfo.toNumber, fromNumber:loginInfo.holkaAlertNumber, message: msgContent, twilioLocalKey: loginInfo.twilioLocalKey }
-    // }, function(error, response, body){
-    //     if (!error && response.statusCode == 200) {
-    //         console.log(body);
-    //     } else {
-    //         sendEmail();
-    //     }
-    // });
+	request.post({
+          url:	serverInfo.twilioSendServer,
+          form: { toNumber: loginInfo.toNumber, fromNumber:loginInfo.holkaAlertNumber, message: content, twilioLocalKey: loginInfo.twilioLocalKey }
+    }, function(error, response, body){
+        if (!error && response.statusCode == 200) {
+            console.log(body);
+        } else {
+            console.log("failed",error,response);
+            sendEmail();
+        }
+    });
 
 
     console.log(content);
