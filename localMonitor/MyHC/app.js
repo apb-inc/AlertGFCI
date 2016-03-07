@@ -14,6 +14,8 @@ router.get('/', function(req,res){
     res.send({"status":"200"});
 });
 var services = require('./source/servicesInfo.js');
+var loginInfo = require('./source/loginInfo.js');
+var serverInfo = require('./source/serverInfo.js');
 
 
 for (var i=0;i<services.length;i++){
