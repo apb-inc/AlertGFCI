@@ -7,6 +7,7 @@
 /huedash/node_modules/
 node_modules
 log.txt
-services.js
 loginInfo.js
 logininfo.js
+serverInfo.js
+servicesInfo.js

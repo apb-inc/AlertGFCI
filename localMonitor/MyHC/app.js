@@ -15,11 +15,17 @@ router.get('/', function(req,res){
 });
 var services = require('./services.js');
 
+
+for (var i=0;i<services.length;i++){
+    services[i].isOnline = true;
+    services[i].needsToSend = true;
+}
+
 setInterval(function(){
     for (var i=0;i<services.length;i++){
         checkServiceHealth(services[i].name,services[i].ip);
     }
-}, 2000);
+}, 3000);
 
 function serviceObjectFromName(serviceName){
     var found = services.filter(function(item) { return item.name === serviceName; });
@@ -30,19 +36,19 @@ function sendMessage(content){
 
     //Check if Twilio is online if offline use Node mailer
 
-	request.post({
-          url:	serverInfo.twilioSendServer,
-          form: { toNumber: toNumber, fromNumber:loginInfo.holkaAlertNumber, message: msgContent, twilioLocalKey: loginInfo.twilioLocalKey }
-    }, function(error, response, body){
-        if (!error && response.statusCode == 200) {
-            console.log(body);
-        } else {
-            sendEmail();
-        }
-    });
+	// request.post({
+    //       url:	serverInfo.twilioSendServer,
+    //       form: { toNumber: loginInfo.toNumber, fromNumber:loginInfo.holkaAlertNumber, message: msgContent, twilioLocalKey: loginInfo.twilioLocalKey }
+    // }, function(error, response, body){
+    //     if (!error && response.statusCode == 200) {
+    //         console.log(body);
+    //     } else {
+    //         sendEmail();
+    //     }
+    // });
 
 
-    console.log("sending email "+content);
+    console.log(content);
 }
 
 
