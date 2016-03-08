@@ -25,7 +25,7 @@ for (var i=0;i<services.length;i++){
 
 setInterval(function(){
     for (var i=0;i<services.length;i++){
-        checkServiceHealth(services[i].name,services[i].ip);
+        checkServiceHealth(services[i].name,services[i].ip+":"+services[i].port);
     }
 }, 3000);
 
@@ -35,9 +35,9 @@ function serviceObjectFromName(serviceName){
 }
 
 function sendMessage(alertInfo, msgContent){
-    console.log("SEND MESSAGGE");
     //Check if Twilio is online if offline use Node mailer
     if(alertInfo) {
+        console.log(alertInfo.length);
 		for (var i = 0; i < alertInfo.length; i++) {
 		    sendText(alertInfo[i],msgContent);
 		}
@@ -90,17 +90,17 @@ function sendAlert(serviceObj, isOnline){
     var serviceName = serviceObj.name;
         if(isOnline){
             sendMessage(serviceObj.alertInfo,new Date()+serviceName+" is online!");
+            console.log(new Date()+serviceName+" is online!");
             serviceObj.needsToSend = true;
         } else if(serviceObj.needsToSend) {
             sendMessage(serviceObj.alertInfo,new Date()+serviceName+" is offline!");
+            console.log(new Date()+serviceName+" is offline!");
             serviceObj.needsToSend = false;
         }
 
 }
 
-
 function checkServiceHealth(name,ip){
-    console.log("checking");
     request(ip, function (error, response, body) {
         var serviceObj = serviceObjectFromName(name);
         if(error){
