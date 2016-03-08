@@ -37,7 +37,6 @@ function serviceObjectFromName(serviceName){
 function sendMessage(alertInfo, msgContent){
     //Check if Twilio is online if offline use Node mailer
     if(alertInfo) {
-        console.log(alertInfo.length);
 		for (var i = 0; i < alertInfo.length; i++) {
 		    sendText(alertInfo[i],msgContent);
 		}
@@ -52,11 +51,11 @@ function sendText(alertInfo, msgContent){
             // console.log(body);
         } else {
             // console.log(new Date()+"failed to text",error);
-            console.log(new Date()+"Sending email to " + alertInfo.email);
+            // console.log(new Date()+"Sending email to " + alertInfo.email);
             sendEmail(alertInfo.email,msgContent);
         }
     });
-    console.log(msgContent);
+    // console.log(msgContent);
 }
 
 
@@ -64,25 +63,25 @@ function sendText(alertInfo, msgContent){
 function sendEmail(email, msgContent){
     var currentTime = new Date();
     console.log(currentTime+"sending email");
-    // var transporter = nodemailer.createTransport({
-    //     service: 'Gmail',
-    //     auth: {
-    //         user: loginInfo.gmailHolkaUser,
-    //         pass: loginInfo.gmailHolkaPass
-    //     }
-    // });
-    // var mailOptions = {
-    //     from: loginInfo.fromEmail,
-    //     to: email,
-    //     subject: 'Holka server down Alert!',
-    //     text: msgContent
-    // };
-    // transporter.sendMail(mailOptions, function(error, info){
-    //     if(error){
-    //         return console.log(error);
-    //     }
-    //     console.log('Message sent: ' + info.response);
-    // });
+    var transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: {
+            user: loginInfo.gmailHolkaUser,
+            pass: loginInfo.gmailHolkaPass
+        }
+    });
+    var mailOptions = {
+        from: loginInfo.fromEmail,
+        to: email,
+        subject: 'Holka server down Alert!',
+        text: msgContent
+    };
+    transporter.sendMail(mailOptions, function(error, info){
+        if(error){
+            return console.log(error);
+        }
+        console.log('Message sent: ' + info.response);
+    });
 }
 
 
