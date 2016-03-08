@@ -17,6 +17,7 @@ var services = require('./source/servicesInfo.js');
 var loginInfo = require('./source/loginInfo.js');
 var serverInfo = require('./source/serverInfo.js');
 
+console.log(services);
 
 for (var i=0;i<services.length;i++){
     services[i].isOnline = true;
@@ -34,13 +35,22 @@ function serviceObjectFromName(serviceName){
     return found[0];
 }
 
-function sendMessage(content){
+function sendMessage(toNumber, msgContent){
 
     //Check if Twilio is online if offline use Node mailer
+    if( Object.prototype.toString.call(toNumber) === '[object Array]' ) {
+		for (var i = 0; i < toNumber.length; i++) {
+		    sendText(toNumber[i],msgContent);
+		}
+	} else {
+		sendText(toNumber, msgContent);
+	}
+}
 
-	request.post({
+function sendText(toNumber, msgContent){
+    request.post({
           url:	serverInfo.twilioSendServer,
-          form: { toNumber: loginInfo.toNumber, fromNumber:loginInfo.holkaAlertNumber, message: content, twilioLocalKey: loginInfo.twilioLocalKey }
+          form: { toNumber: toNumber, fromNumber:loginInfo.holkaAlertNumber, message: content, twilioLocalKey: loginInfo.twilioLocalKey }
     }, function(error, response, body){
         if (!error && response.statusCode == 200) {
             console.log(body);
@@ -51,6 +61,7 @@ function sendMessage(content){
     });
     console.log(content);
 }
+
 
 
 function sendEmail(content){
@@ -81,10 +92,10 @@ function sendEmail(content){
 function sendAlert(serviceObj, isOnline){
     var serviceName = serviceObj.name;
         if(isOnline){
-            sendMessage(new Date()+serviceName+" is online!");
+            sendMessage(serviceObj.alertNumbers,new Date()+serviceName+" is online!");
             serviceObj.needsToSend = true;
         } else if(serviceObj.needsToSend) {
-            sendMessage(new Date()+serviceName+" is offline!");
+            sendMessage(serviceObj.alertNumbers,new Date()+serviceName+" is offline!");
             serviceObj.needsToSend = false;
         }
 
