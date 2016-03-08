@@ -17,7 +17,6 @@ var services = require('./source/servicesInfo.js');
 var loginInfo = require('./source/loginInfo.js');
 var serverInfo = require('./source/serverInfo.js');
 
-console.log(services);
 
 for (var i=0;i<services.length;i++){
     services[i].isOnline = true;
@@ -35,67 +34,65 @@ function serviceObjectFromName(serviceName){
     return found[0];
 }
 
-function sendMessage(toNumber, msgContent){
-
+function sendMessage(alertInfo, msgContent){
+    console.log("SEND MESSAGGE");
     //Check if Twilio is online if offline use Node mailer
-    if( Object.prototype.toString.call(toNumber) === '[object Array]' ) {
-		for (var i = 0; i < toNumber.length; i++) {
-		    sendText(toNumber[i],msgContent);
+    if(alertInfo) {
+		for (var i = 0; i < alertInfo.length; i++) {
+		    sendText(alertInfo[i],msgContent);
 		}
-	} else {
-		sendText(toNumber, msgContent);
 	}
 }
-
-function sendText(toNumber, msgContent){
+function sendText(alertInfo, msgContent){
     request.post({
           url:	serverInfo.twilioSendServer,
-          form: { toNumber: toNumber, fromNumber:loginInfo.holkaAlertNumber, message: content, twilioLocalKey: loginInfo.twilioLocalKey }
+          form: { toNumber: alertInfo.number, fromNumber:loginInfo.holkaAlertNumber, message: msgContent, twilioLocalKey: loginInfo.twilioLocalKey }
     }, function(error, response, body){
         if (!error && response.statusCode == 200) {
-            console.log(body);
+            // console.log(body);
         } else {
-            console.log(new Date()+"failed to text",error);
-            sendEmail(content);
+            // console.log(new Date()+"failed to text",error);
+            console.log(new Date()+"Sending email to " + alertInfo.email);
+            sendEmail(alertInfo.email,msgContent);
         }
     });
-    console.log(content);
+    console.log(msgContent);
 }
 
 
 
-function sendEmail(content){
+function sendEmail(email, msgContent){
     var currentTime = new Date();
     console.log(currentTime+"sending email");
-    var transporter = nodemailer.createTransport({
-        service: 'Gmail',
-        auth: {
-            user: loginInfo.gmailHolkaUser,
-            pass: loginInfo.gmailHolkaPass
-        }
-    });
-    var mailOptions = {
-        from: loginInfo.fromEmail,
-        to: loginInfo.toEmail,
-        subject: 'Floatee update!',
-        text: content
-    };
-    transporter.sendMail(mailOptions, function(error, info){
-        if(error){
-            return console.log(error);
-        }
-        console.log('Message sent: ' + info.response);
-    });
+    // var transporter = nodemailer.createTransport({
+    //     service: 'Gmail',
+    //     auth: {
+    //         user: loginInfo.gmailHolkaUser,
+    //         pass: loginInfo.gmailHolkaPass
+    //     }
+    // });
+    // var mailOptions = {
+    //     from: loginInfo.fromEmail,
+    //     to: email,
+    //     subject: 'Holka server down Alert!',
+    //     text: msgContent
+    // };
+    // transporter.sendMail(mailOptions, function(error, info){
+    //     if(error){
+    //         return console.log(error);
+    //     }
+    //     console.log('Message sent: ' + info.response);
+    // });
 }
 
 
 function sendAlert(serviceObj, isOnline){
     var serviceName = serviceObj.name;
         if(isOnline){
-            sendMessage(serviceObj.alertNumbers,new Date()+serviceName+" is online!");
+            sendMessage(serviceObj.alertInfo,new Date()+serviceName+" is online!");
             serviceObj.needsToSend = true;
         } else if(serviceObj.needsToSend) {
-            sendMessage(serviceObj.alertNumbers,new Date()+serviceName+" is offline!");
+            sendMessage(serviceObj.alertInfo,new Date()+serviceName+" is offline!");
             serviceObj.needsToSend = false;
         }
 
@@ -103,6 +100,7 @@ function sendAlert(serviceObj, isOnline){
 
 
 function checkServiceHealth(name,ip){
+    console.log("checking");
     request(ip, function (error, response, body) {
         var serviceObj = serviceObjectFromName(name);
         if(error){
