@@ -56,6 +56,15 @@ dash_lr_bright.on("detected", function(){
 });
 
 var countOne=0;
+
+app.get('/color', function(req,res){
+	if (countOne>9){
+		countOne = 0;
+	}
+    setColor(countOne,"dash_lr");
+    countOne++;
+});
+
 dash_lr.on("detected", function (){
 	if (countOne>9){
 		countOne = 0;

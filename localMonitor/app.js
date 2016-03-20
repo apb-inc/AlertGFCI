@@ -19,17 +19,24 @@ router.get('/', function(req,res){
 var services = require('./source/servicesInfo.js');
 var loginInfo = require('./source/loginInfo.js');
 var serverInfo = require('./source/serverInfo.js');
+var intervalTime = 5;
+
+if(debug){
+	intervalTime = .1;
+}
 
 for (var i=0;i<services.length;i++){
     services[i].isOnline = true;
     services[i].needsToSend = true;
 }
 
+
+
 setInterval(function(){
     for (var i=0;i<services.length;i++){
         checkServiceHealth(services[i].name,services[i].ip+":"+services[i].port);
     }
-}, .1*60*1000);
+}, intervalTime*60*1000);
 
 function serviceObjectFromName(serviceName){
     var found = services.filter(function(item) { return item.name === serviceName; });
