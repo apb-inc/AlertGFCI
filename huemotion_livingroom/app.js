@@ -65,7 +65,8 @@ sensorOne.watch(function(err, value) {
 router.get('/extend', function(req,res){
 	console.log("updating hue timer via extend"+new Date());
 	curTime = new Date();
-	lightsOffTime = new Date(curTime.getTime() + lightTimer*60*1000);		
+	lightsOffTime = new Date(curTime.getTime() + lightTimer*60*1000);	
+	lightsOffTimeTwo = new Date(curTime.getTime() + lightTimer*60*1000);		
     res.send({"status":"200"});        
 });
 
