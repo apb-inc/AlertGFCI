@@ -11,5 +11,5 @@ console.log('Magic happens on port ' + port +" - "+ new Date());
 
 
 router.get('/', function(req,res){
-    res.send({"status":"200"});        
+    res.send({"status":"200"});
 });
