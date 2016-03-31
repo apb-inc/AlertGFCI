@@ -12,12 +12,31 @@ var router = express.Router();
 app.use('/', router);
 app.listen(port);
 var currentTimeo = new Date();
-currentTimeo = new Date(currentTimeo.getTime()-60*60*1000);
 console.log('Magic happens on port ' + port +" - "+ currentTimeo);
 
-var healthCheckMins = 30;
-var needToSend = true;
-var logOnline = false;
+var rpi433    = require('rpi-433'),
+    rfSniffer = rpi433.sniffer(2, 500), //Snif on PIN 2 with a 500ms debounce delay
+    rfSend    = rpi433.sendCode;
+
+// Receive
+rfSniffer.on('codes', function (code) {
+  console.log('Code received: '+code);
+});
+
+// Send
+rfSend(1234, 0, function(error, stdout) {   //Send 1234
+  if(!error) console.log(stdout); //Should display 1234
+});
+
+/*
+You can also use rfSend like that :
+
+rfSend(code);
+rfSend(code, pin);
+rfSend(code, callback);
+rfSend(code, pin, callback);
+*/
+
 
 setInterval(function(){
     //This will check if the pi is online every x number of minutes

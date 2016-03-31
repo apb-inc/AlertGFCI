@@ -1,5 +1,5 @@
 {
-    "name": "Remote Control",
+    "name": "RemoteControl",
     "description": "App that automates light switches",
     "version": "0.0.1",
     "main": "app.js",
