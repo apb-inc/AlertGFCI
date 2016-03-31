@@ -1,0 +1,14 @@
+{
+    "name": "Remote Control",
+    "description": "App that automates light switches",
+    "version": "0.0.1",
+    "main": "app.js",
+    "dependencies": {
+        "express": "4.13.3",
+        "ejs":"2.3.3",
+        "body-parser":"1.14.2",
+        "nodemailer":"1.10.0",
+        "request":"2.67.0",
+        "rpi-433":"1.1.1"
+    }
+}
