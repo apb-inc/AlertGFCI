@@ -1,6 +1,8 @@
 var Gpio = require('onoff').Gpio;
 var sensor_br = new Gpio(14, 'in','both');
 var sensor_fr = new Gpio(21, 'in','both');
+var CronJob = require('cron').CronJob;
+
 
 var lightsOffTime = new Date();
 var lightTimer = 25;
@@ -41,6 +43,35 @@ exports.start = function(){
 			lights.flipHueOff();
 		}
 	}, 1*60*1000);	
+	
+	
+	var dimLightsAtNight = new CronJob('00 30 20 * * *', function() {
+			var allLights = false;
+			lights.setHueBrightnessLightsOff(20,allLights);
+			lights.setHueColorTemp(500,allLights);
+		}, function () {
+		/* This function is executed when the job stops */
+		},
+		true, /* Start the job right now */
+		'America/Chicago'
+	);
+	
+	var brightenLightsInMorning = new CronJob('00 30 4 * * *', function() {
+		var allLights = false;
+		lights.setHueBrightness(50,allLights);
+		lights.setHueColorTemp(500,allLights);
+		}, function () {
+		/* This function is executed when the job stops */
+		},
+		true, /* Start the job right now */
+		'America/Chicago'
+	);
+	
+
+
+		var allLights = false;
+		lights.setHueBrightness(50,allLights);
+		lights.setHueColorTemp(500,allLights);
 };
 
 

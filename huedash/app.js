@@ -92,7 +92,7 @@ function setHueBrightness(brightness){
 function setColor(count,dashBtn){
 	switch(count) {
 	    case 0:
-			setLightFromColor("152,0,0",dashBtn);
+			setLightFromColor("0,255,0",dashBtn);
 	        break;
 	    case 1:
 			setLightFromColor("255,0,0",dashBtn);

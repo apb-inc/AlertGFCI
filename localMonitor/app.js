@@ -5,7 +5,7 @@ var nodemailer = require('nodemailer');
 var express = require('express');
 var app = express();
 
-var port = process.env.PORT || 8188;
+var port = process.env.PORT || 8080;
 var router = express.Router();
 // Route settings
 app.use('/', router);

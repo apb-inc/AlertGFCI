@@ -35,6 +35,10 @@ function setHueBrightness(brightness, allLights){
 	set(hueState,allLights);
 }
 
+function setHueColorTemp(temp, allLights){
+	hueState = lightState.create().ct(500);
+	set(hueState,allLights);
+}
 
 
 function flipHueOn(allLightsOn){
@@ -100,3 +104,4 @@ module.exports.turnLampOff = turnLampOff;
 module.exports.setHueBrightness = setHueBrightness;
 module.exports.turnLampOn = turnLampOn;
 module.exports.turnLampOff = turnLampOff;
+module.exports.setHueColorTemp = setHueColorTemp;

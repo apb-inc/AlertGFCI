@@ -29,13 +29,12 @@ app.get('/', function(req,res){
 
 
 var brightCount = 0;
-
 var countOne=0;
 var brightCount = 0;
 var lowWaterSendCount = 0;
 
-
 app.get('/color/:redColor/:greenColor/:blueColor', function(req, res){
+	console.log("color change");
 	var redColor = req.params.redColor;
 	var greenColor = req.params.greenColor;
 	var blueColor = req.params.blueColor;
@@ -50,25 +49,8 @@ app.get('/color/:redColor/:greenColor/:blueColor', function(req, res){
 	res.send("OK");
 });
 
-
-
-/*
-app.get('/btnOne', function(req,res){
-	if (countOne>9){
-		countOne = 0;
-	}
-	hueState = lightState.create().effect("none");
-	setLight(hueState);
-
-	setTimeout(function(){
-	    setColor(countOne);
-		countOne++;
-	},1000)
-	extendLightTimer();
-});
-*/
-
 app.get('/btnTwo', function(req,res){
+	console.log("btn two");
     hueState = lightState.create().effect("colorloop");
     hueState.on();
     setLight(hueState);
@@ -77,22 +59,41 @@ app.get('/btnTwo', function(req,res){
 
 });
 
-
-app.get('/btnThree', function(req,res){
-	if(brightCount == 0){
+app.get('/brightness/:level', function(req, res){
+	var level = req.params.level;
+	if(level == 3){
 		setHueBrightness(100);
-		brightCount++;
-	} else if(brightCount==1) {
+	} else if(level==2) {
 		setHueBrightness(60);
-		brightCount++;
 	} else {
 		setHueBrightness(30);
-		brightCount=0;
 	}
 	res.send("OK");
 
-
 });
+
+app.get('/btnThree', function(req,res){
+	console.log("btn three");
+	var sonosUrl = 'http://192.168.0.100:5005/living room/';
+	request(sonosUrl+'favorite/pretty lights radio', function (error, response, body){
+	    if (!error && response.statusCode == 200) {
+	        console.log(body)
+	        request(sonosUrl+'playpause', function (error, response, body){
+	            if (!error && response.statusCode == 200) {
+	                console.log("Success"+ new Date());
+	            } else {
+					console.log("error");
+	            }
+	        });
+	    } else {
+	        console.log("error");
+	    }
+	});	
+	
+});
+
+
+
 
 app.get('/waterAlert',function(req,res){
 	console.log(new Date()+ " Low fountain water Detected");
@@ -117,44 +118,6 @@ function setHueBrightness(brightness){
 	hueState = lightState.create().brightness(brightness).on();
 	setLight(hueState);
 	extendLightTimer();
-
-}
-
-
-function setColor(count){
-	switch(count) {
-	    case 0:
-			setLightFromColor("152,0,0");
-	        break;
-	    case 1:
-			setLightFromColor("255,0,0");
-	        break;
-	    case 2:
-			setLightFromColor("255,153,0");
-	        break;
-	    case 3:
-			setLightFromColor("255,255,0");
-	        break;
-	    case 4:
-			setLightFromColor("0,255,0");
-	        break;
-	    case 5:
-			setLightFromColor("74,134,232");
-	        break;
-	    case 6:
-			setLightFromColor("0,0,255");
-	        break;
-	    case 7:
-			setLightFromColor("153,0,255");
-	        break;
-	    case 8:
-			setLightFromColor("255,0,255");
-	        break;
-	    case 9:
-			setLightFromColor("255,255,255");
-	        break;
-	    default:
-	}
 }
 
 function setLightFromColor(color){
