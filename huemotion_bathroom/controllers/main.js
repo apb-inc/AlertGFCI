@@ -67,11 +67,17 @@ exports.start = function(){
 		'America/Chicago'
 	);
 	
-
-
-		var allLights = false;
-		lights.setHueBrightness(50,allLights);
-		lights.setHueColorTemp(500,allLights);
+	var brightenLightsInMorning = new CronJob('00 30 5 * * *', function() {
+			lights.turnBedroomLampOff();
+		}, function () {
+		/* This function is executed when the job stops */
+		},
+		true, /* Start the job right now */
+		'America/Chicago'
+	);
+	
+	
+	
 };
 
 

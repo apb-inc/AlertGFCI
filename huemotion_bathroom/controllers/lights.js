@@ -71,6 +71,20 @@ function setLampState(hueState){
 }
 
 
+
+function turnBedroomLampOff(){
+	hueState = lightState.create().off();
+	setBedroomLampState(hueState);
+}
+
+function setBedroomLampState(hueState){
+	api.setLightState(4, hueState)
+	    .then()
+	    .fail(displayError)
+	    .done();
+}
+
+
 function set(hueState,allLightsOn){
     api.setLightState(1, hueState)
         .then()
@@ -92,9 +106,9 @@ function set(hueState,allLightsOn){
 		    .then()
 			.fail(displayError)
 		    .done();            
-    }
-        
+    }     
 };
+
 
 module.exports.set = set;
 module.exports.flipHueOff = flipHueOff;
@@ -105,3 +119,4 @@ module.exports.setHueBrightness = setHueBrightness;
 module.exports.turnLampOn = turnLampOn;
 module.exports.turnLampOff = turnLampOff;
 module.exports.setHueColorTemp = setHueColorTemp;
+module.exports.turnBedroomLampOff = turnBedroomLampOff;
