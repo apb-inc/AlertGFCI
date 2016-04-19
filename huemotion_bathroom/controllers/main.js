@@ -47,8 +47,9 @@ exports.start = function(){
 	
 	var dimLightsAtNight = new CronJob('00 30 20 * * *', function() {
 			var allLights = false;
-			lights.setHueBrightnessLightsOff(20,allLights);
+			lights.setHueBrightness(20,allLights);
 			lights.setHueColorTemp(500,allLights);
+			
 		}, function () {
 		/* This function is executed when the job stops */
 		},
@@ -67,7 +68,7 @@ exports.start = function(){
 		'America/Chicago'
 	);
 	
-	var brightenLightsInMorning = new CronJob('00 30 5 * * *', function() {
+	var bedroomLampOffInMorning = new CronJob('00 30 5 * * *', function() {
 			lights.turnBedroomLampOff();
 		}, function () {
 		/* This function is executed when the job stops */
