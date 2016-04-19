@@ -106,9 +106,6 @@ var displayResult = function(result) {
     console.log(JSON.stringify(result, null, 2));
 };
 
-api.lights()
-    .then(displayResult)
-    .done();
 
 
 function updateHueTimer(){
@@ -167,5 +164,22 @@ function setLightTwo(hueState){
 	    if (err) throw err;
 	});
 }
+
+
+var dimLightsAtNight = new CronJob('00 00 20 * * *', function() {
+		hueState = lightState.create().brightness(20).ct(500).on();
+		setLight(hueState);
+		setLightTwo(hueState);
+	}, function () {
+	/* This function is executed when the job stops */
+	},
+	true, /* Start the job right now */
+	'America/Chicago'
+);
+
+
+
+
+
 
 
