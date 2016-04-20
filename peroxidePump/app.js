@@ -21,7 +21,7 @@ function dosePump(){
     }
 }
 
-var dosePumpMorning = new CronJob('00 30 3 * * *', function() {
+var dosePumpMorning = new CronJob('00 30 7 * * *', function() {
         dosePump();
     }, function () {
     /* This function is executed when the job stops */
