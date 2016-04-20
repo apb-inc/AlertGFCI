@@ -16,47 +16,47 @@ var lights = require('./lights.js');
 exports.start = function(){
 	sensor_br.watch(function(err, value) {
 		var allLightsOn = false;
-	
+
 	    if (value==1){
 		    console.log("-----------------------------------------------------------------");
 			console.log("Flip on from bathroom sensor"+new Date());
 		    lights.flipHueOn(allLightsOn);
-	        updateHueTimer(20);       
-	    } 
+	        updateHueTimer(20);
+	    }
 	});
-	
+
 	sensor_fr.watch(function(err, value) {
 		var allLightsOn = true;
 	    if (value==1){
 		    console.log("-----------------------------------------------------------------");
 			console.log("Flip on from float room sensor"+new Date());
 		    lights.flipHueOn(allLightsOn);
-	        updateHueTimer(5);       
-	    } 
+	        updateHueTimer(5);
+	    }
 	});
-	
+
 	setInterval(function(){
 		curTime = new Date();
-		console.log("curtime"+ curTime+"light off"+lightsOffTime)
+		console.log("curtime"+ curTime+"light off"+lightsOffTime);
 		if(curTime > lightsOffTime){
 			console.log("Flip off" + new Date());
 			lights.flipHueOff();
 		}
-	}, 1*60*1000);	
-	
-	
+	}, 1*60*1000);
+
+
 	var dimLightsAtNight = new CronJob('00 30 20 * * *', function() {
 			var allLights = false;
 			lights.setHueBrightness(20,allLights);
 			lights.setHueColorTemp(500,allLights);
-			
+
 		}, function () {
 		/* This function is executed when the job stops */
 		},
 		true, /* Start the job right now */
 		'America/Chicago'
 	);
-	
+
 	var brightenLightsInMorning = new CronJob('00 30 4 * * *', function() {
 		var allLights = false;
 		lights.setHueBrightness(50,allLights);
@@ -67,7 +67,7 @@ exports.start = function(){
 		true, /* Start the job right now */
 		'America/Chicago'
 	);
-	
+
 	var bedroomLampOffInMorning = new CronJob('00 30 5 * * *', function() {
 			lights.turnBedroomLampOff();
 		}, function () {
@@ -76,9 +76,9 @@ exports.start = function(){
 		true, /* Start the job right now */
 		'America/Chicago'
 	);
-	
-	
-	
+
+
+
 };
 
 
@@ -88,7 +88,7 @@ function updateHueTimer(time){
 		time = lightTimer;
 	}
 	curTime = new Date();
-	lightsOffTime = new Date(curTime.getTime() + time*60*1000);		
+	lightsOffTime = new Date(curTime.getTime() + time*60*1000);
 }
 
 
