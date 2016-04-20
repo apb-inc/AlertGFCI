@@ -9,15 +9,27 @@ app.listen(port);
 console.log('Magic happens on port ' + port +" - "+ new Date());
 
 
-function dosePump(pumpMins){
+function turnDosePumpOn(){
+    var isPumpActive = false;
     if(!floatInProgress){
         peroxidePump.writeSync(1);
-        setTimeout(function(){
-            peroxidePump.writeSync(0);
-        }, pumpMins*60*1000);
+        isPumpActive = true;
     } else {
         //add text message for float in progress when dosing peroxide
         console.log(new Date()+" Float is in progress when trying to pump peroxide!");
+    }
+    return isPumpActive;
+}
+
+function dosePumpOff(){
+    peroxidePump.writeSync(0);
+}
+
+function dosePump(pumpMins){
+    if(turnDosePumpOn()){
+        setTimeout(function(){
+            dosePumpOff();
+        }, pumpMins*60*1000);
     }
 }
 
@@ -48,18 +60,16 @@ var dosePumpNight = new CronJob('00 55 23 * * *', function() {
     'America/Chicago'
 );
 
-
 app.get('/', function(req,res){
     res.send({"status":"200"});
 });
 
+app.get('/peroxidePump/:state/:pumpTime', function(req,res){
+    if(req.params.state == "on"){
+        dosePump(req.params.pumpTime);
+    } else {
+        dosePumpOff();
+    }
 
-app.get('/on', function(req,res){
-    dosePump(3);
-    res.send({"status":"200"});
-});
-
-app.get('/off', function(req,res){
-    dosePump(3);
     res.send({"status":"200"});
 });
