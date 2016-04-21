@@ -8,6 +8,10 @@ var peroxidePump = new Gpio(22, 'out');
 app.listen(port);
 console.log('Magic happens on port ' + port +" - "+ new Date());
 
+//30-50ppm
+var smallPeroxideDose = 0.5;
+//150-250ppm
+var largePeroxideDose = 2;
 
 function turnDosePumpOn(){
     var isPumpActive = false;
@@ -34,7 +38,7 @@ function dosePump(pumpMins){
 }
 
 var dosePumpMorning = new CronJob('00 30 7 * * *', function() {
-        dosePump(3);
+        dosePump(smallPeroxideDose);
     }, function () {
     /* This function is executed when the job stops */
     },
@@ -43,7 +47,7 @@ var dosePumpMorning = new CronJob('00 30 7 * * *', function() {
 );
 
 var dosePumpAfternoon = new CronJob('00 30 13 * * *', function() {
-        dosePump(3);
+        dosePump(smallPeroxideDose);
     }, function () {
     /* This function is executed when the job stops */
     },
@@ -52,7 +56,7 @@ var dosePumpAfternoon = new CronJob('00 30 13 * * *', function() {
 );
 
 var dosePumpNight = new CronJob('00 55 23 * * *', function() {
-        dosePump(3);
+        dosePump(smallPeroxideDose);
     }, function () {
     /* This function is executed when the job stops */
     },
@@ -65,7 +69,7 @@ app.get('/', function(req,res){
 });
 
 app.get('/peroxidePump/:state/:pumpTime', function(req,res){
-    if(req.params.state == "on"){
+    if(req.params.state === "on"){
         dosePump(req.params.pumpTime);
     } else {
         dosePumpOff();
