@@ -45,7 +45,7 @@ exports.start = function(){
 	}, 1*60*1000);	
 	
 	
-	var dimLightsAtNight = new CronJob('00 30 20 * * *', function() {
+	var dimLightsAtNight = new CronJob('00 00 20 * * *', function() {
 			var allLights = false;
 			lights.setHueBrightness(20,allLights);
 			lights.setHueColorTemp(500,allLights);
