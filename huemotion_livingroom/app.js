@@ -31,6 +31,7 @@ var lightTimer = 30;
 var HueApi = hue.HueApi;
 var lightState = hue.lightState;
 var curTime;
+var theTime;
 
 var hostname = "192.168.0.103",
     username = "22ae6b2233c8b2971a18523e9343ca3",
@@ -43,7 +44,6 @@ api = new HueApi(hostname, username);
 sensorTwo.watch(function(err, value) {
 	curTime = new Date();
     if (value==1){
-		console.log("Two: motion detected- "+curTime);
 		flipHueTwoOn();
 		updateHueTimerTwo();       	
     } 
@@ -52,10 +52,8 @@ sensorTwo.watch(function(err, value) {
 
 sensorOne.watch(function(err, value) {
 	curTime = new Date();
-	
     if (value==1){
-		console.log("One: motion detected - "+curTime);
-		if(checkTime(curTime)){
+		if(checkIsDayTime(curTime)){
 			flipHueOn();
 			updateHueTimer();       	
 		}
@@ -70,7 +68,7 @@ router.get('/extend', function(req,res){
     res.send({"status":"200"});        
 });
 
-function checkTime(theTime){
+function checkIsDayTime(theTime){
 	var shouldTurnOn = false;
 	if(theTime.getHours()>=16){
 		shouldTurnOn = true;
@@ -78,12 +76,20 @@ function checkTime(theTime){
 		shouldTurnOn = true;
 	}
 	return shouldTurnOn;
-	
+}
+
+function checkTimeForRandom(theTime){
+	var shouldTurnOn = false;
+	if(theTime.getHours()>=16 && theTime.getHours()<=22){
+		shouldTurnOn = true;
+	} else if(theTime.getHours()<8 && theTime.getHours()>=6){
+		shouldTurnOn = true;
+	}
+	return shouldTurnOn;
 }
 
 setInterval(function(){
 	curTime = new Date();
-	console.log("One: Cur time"+ curTime + "lights off two time"+lightsOffTime);
 	if(curTime > lightsOffTime){
 		flipHueOff();
 		console.log("One: flipping hue off" + new Date());
@@ -92,11 +98,8 @@ setInterval(function(){
 
 setInterval(function(){
 	curTime = new Date();
-	console.log("Two: Cur time"+ curTime + "lights off two time"+lightsOffTimeTwo);
-	console.log("Lights off time"+lightsOffTimeTwo);
 	if(curTime > lightsOffTimeTwo){
 		flipHueTwoOff();
-		console.log("Two: flipping hue off" + new Date());
 	}
 }, 5*60*1000);
 
@@ -166,7 +169,29 @@ function setLightTwo(hueState){
 }
 
 
-var dimLightsAtNight = new CronJob('00 00 20 * * *', function() {
+var dimLightsInEvening= new CronJob('00 55 19 * * *', function() {
+		hueState = lightState.create().brightness(50).ct(500).on();
+		setLight(hueState);
+		setLightTwo(hueState);
+	}, function () {
+	/* This function is executed when the job stops */
+	},
+	true, /* Start the job right now */
+	'America/Chicago'
+);
+
+var dimLightsInEveningThirty= new CronJob('00 30 20 * * *', function() {
+		hueState = lightState.create().brightness(30).ct(500).on();
+		setLight(hueState);
+		setLightTwo(hueState);
+	}, function () {
+	/* This function is executed when the job stops */
+	},
+	true, /* Start the job right now */
+	'America/Chicago'
+);
+
+var dimLightsInEveningTwenty= new CronJob('00 45 20 * * *', function() {
 		hueState = lightState.create().brightness(20).ct(500).on();
 		setLight(hueState);
 		setLightTwo(hueState);
@@ -178,7 +203,57 @@ var dimLightsAtNight = new CronJob('00 00 20 * * *', function() {
 );
 
 
+var dimLightsInEveningTen= new CronJob('00 45 21 * * *', function() {
+		hueState = lightState.create().brightness(20).ct(500).on();
+		setLight(hueState);
+		setLightTwo(hueState);
+	}, function () {
+	/* This function is executed when the job stops */
+	},
+	true, /* Start the job right now */
+	'America/Chicago'
+);
 
+function randomizeLights(bright){
+	var r = Math.floor((Math.random() * 255) + 1);
+	var g = Math.floor((Math.random() * 255) + 1);
+	var b = Math.floor((Math.random() * 255) + 1);
+	if(bright){
+		hueState = lightState.create().brightness(75).rgb(r,g,b).on();
+	} else {
+		hueState = lightState.create().rgb(r,g,b).on();
+	}
+	setLight(hueState);
+	setLightTwo(hueState);
+}
+
+
+setInterval(function(){
+	theTime = new Date();
+	var bright = false;
+	console.log("test");
+	if(checkTimeForRandom(theTime)){
+		randomizeLights(bright);
+	}
+		
+}, .5*60*1000);
+
+
+var brightenLightsMorning= new CronJob('00 45 5 * * *', function() {
+	
+	var bright = true;
+	randomizeLights(bright);
+
+
+	}, function () {
+	/* This function is executed when the job stops */
+	},
+	true, /* Start the job right now */
+	'America/Chicago'
+);
+
+
+    
 
 
 
