@@ -44,12 +44,13 @@ exports.start = function(){
 		}
 	}, 1*60*1000);	
 	
-	
+
 	var dimLightsAtNight = new CronJob('00 00 20 * * *', function() {
 
 			var allLights = false;
-			lights.setHueBrightness(20,allLights);
+			lights.setHueBrightness(5,allLights);
 			lights.setHueColorTemp(500,allLights);
+			lights.bathroomLights(false);
 
 		}, function () {
 		/* This function is executed when the job stops */
@@ -59,9 +60,9 @@ exports.start = function(){
 	);
 
 	var brightenLightsInMorning = new CronJob('00 30 4 * * *', function() {
-		var allLights = false;
-		lights.setHueBrightness(50,allLights);
-		lights.setHueColorTemp(500,allLights);
+			var allLights = false;
+			lights.setHueBrightness(50,allLights);
+			lights.setHueColorTemp(500,allLights);
 		}, function () {
 		/* This function is executed when the job stops */
 		},
@@ -69,7 +70,7 @@ exports.start = function(){
 		'America/Chicago'
 	);
 
-	var bedroomLampOffInMorning = new CronJob('00 30 5 * * *', function() {
+	var bedroomLampOffInMorning = new CronJob('00 30 8 * * *', function() {
 			lights.turnBedroomLampOff();
 		}, function () {
 		/* This function is executed when the job stops */
@@ -83,6 +84,7 @@ exports.start = function(){
 };
 
 
+
 function updateHueTimer(time){
 	console.log("updating hue timer"+new Date());
 	if(!time){
@@ -92,7 +94,13 @@ function updateHueTimer(time){
 	lightsOffTime = new Date(curTime.getTime() + time*60*1000);
 }
 
+function bath(){
+	var allLightsOn = false;
+	lights.flipHueOn(allLightsOn);
+	        updateHueTimer(60);
+	
+}
 
 
-
+module.exports.bath = bath;
 module.exports.updateHueTimer = updateHueTimer;

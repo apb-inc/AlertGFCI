@@ -1,5 +1,5 @@
 var Float = require('./controllers/float.js');
-
+var Main = require('./controllers/main.js');
 
 module.exports = (function() {
     var router = require('express').Router();
@@ -22,6 +22,11 @@ module.exports = (function() {
         }
 		
 	});
+	
+	router.get('/bath',function (req,res) {
+    Main.bath();
+    res.send({"status":"200"});     
+});
 		
 	router.get('/motionAfterFloat', function(req,res){
 		Float.motionAfterFloat();
