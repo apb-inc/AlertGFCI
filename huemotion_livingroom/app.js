@@ -133,7 +133,7 @@ function updateHueTimerTwo(){
 
 
 function flipHueOn(){
-	hueState = lightState.create().on().transitionInstant();
+	hueState = lightState.create().on()
 	setLight(hueState);
 }
 
@@ -145,7 +145,7 @@ function flipHueOff(){
 
 
 function flipHueTwoOn(){
-	hueState = lightState.create().on().transitionInstant();
+	hueState = lightState.create().on();
 	setLightTwo(hueState);
 }
 
