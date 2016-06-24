@@ -84,7 +84,15 @@ function shouldTurnOnHall(theTime){
 	var shouldTurnOn = false;
 	if(theTime.getHours()>=13 && theTime.getHours()<=20){
 		shouldTurnOn = true;
+	} else if (theTime.getHours()==21){
+		hueState = lightState.create().off();
+		api.setLightState(12, hueState, function(err, lights){
+			if(err) throw err;
+		});
 	}
+
+
+	
 	return shouldTurnOn;
 }
 
