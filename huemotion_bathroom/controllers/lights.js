@@ -84,6 +84,25 @@ function setBedroomLampState(hueState){
 	    .done();
 }
 
+function bathroomLights(on){
+	if(on){
+		hueState = lightState.create().on();
+	} else {
+		hueState = lightState.create().off();
+	}
+	twoBathroomLights(hueState);
+}
+
+function twoBathroomLights(hueState){
+	api.setLightState(1, hueState)
+	    .then()
+	    .fail(displayError)
+	    .done();
+	api.setLightState(2, hueState)
+	    .then()
+	    .fail(displayError)
+	    .done();
+}
 
 function set(hueState,allLightsOn){
     api.setLightState(1, hueState)
@@ -120,3 +139,5 @@ module.exports.turnLampOn = turnLampOn;
 module.exports.turnLampOff = turnLampOff;
 module.exports.setHueColorTemp = setHueColorTemp;
 module.exports.turnBedroomLampOff = turnBedroomLampOff;
+module.exports.bathroomLights = bathroomLights;
+
