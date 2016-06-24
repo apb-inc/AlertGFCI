@@ -32,12 +32,14 @@ var HueApi = hue.HueApi;
 var lightState = hue.lightState;
 var curTime;
 var theTime;
+var hallLightShouldTurnOn = true;
 
 var hostname = "192.168.0.103",
     username = "22ae6b2233c8b2971a18523e9343ca3",
     api;
 
 api = new HueApi(hostname, username);
+
 
 
 
@@ -78,9 +80,18 @@ function checkIsDayTime(theTime){
 	return shouldTurnOn;
 }
 
+function shouldTurnOnHall(theTime){
+	var shouldTurnOn = false;
+	if(theTime.getHours()>=13 && theTime.getHours()<=20){
+		shouldTurnOn = true;
+	}
+	return shouldTurnOn;
+}
+
+
 function checkTimeForRandom(theTime){
 	var shouldTurnOn = false;
-	if(theTime.getHours()>=16 && theTime.getHours()<=22){
+	if(theTime.getHours()>=15 && theTime.getHours()<=19){
 		shouldTurnOn = true;
 	} else if(theTime.getHours()<8 && theTime.getHours()>=6){
 		shouldTurnOn = true;
@@ -92,7 +103,6 @@ setInterval(function(){
 	curTime = new Date();
 	if(curTime > lightsOffTime){
 		flipHueOff();
-		console.log("One: flipping hue off" + new Date());
 	}
 }, 8*60*1000);
 
@@ -123,9 +133,10 @@ function updateHueTimerTwo(){
 
 
 function flipHueOn(){
-	hueState = lightState.create().on();
+	hueState = lightState.create().on().transitionInstant();
 	setLight(hueState);
 }
+
 
 function flipHueOff(){
 	hueState = lightState.create().off();
@@ -134,7 +145,7 @@ function flipHueOff(){
 
 
 function flipHueTwoOn(){
-	hueState = lightState.create().on();
+	hueState = lightState.create().on().transitionInstant();
 	setLightTwo(hueState);
 }
 
@@ -157,9 +168,14 @@ function setLight(hueState){
 	api.setLightState(11, hueState, function(err, lights){
 		if(err) throw err;
 	});
-	api.setLightState(12, hueState, function(err, lights){
-		if(err) throw err;
-	});
+
+	if(hueState._values.on && hallLightShouldTurnOn){
+		api.setLightState(12, hueState, function(err, lights){
+			if(err) throw err;
+		});
+	}
+
+
 }
 
 function setLightTwo(hueState){
@@ -228,23 +244,27 @@ function randomizeLights(bright){
 }
 
 
+
+setInterval(function(){
+	theTime = new Date();
+	hallLightShouldTurnOn = shouldTurnOnHall(theTime);
+}, 5*60*1000)
+
 setInterval(function(){
 	theTime = new Date();
 	var bright = false;
-	console.log("test");
+	console.log(new Date()+" Randomizing lights");
+	
 	if(checkTimeForRandom(theTime)){
 		randomizeLights(bright);
 	}
 		
-}, .5*60*1000);
+}, 120*60*1000);
 
 
 var brightenLightsMorning= new CronJob('00 45 5 * * *', function() {
-	
 	var bright = true;
 	randomizeLights(bright);
-
-
 	}, function () {
 	/* This function is executed when the job stops */
 	},
