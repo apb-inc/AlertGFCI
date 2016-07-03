@@ -181,9 +181,19 @@ function setLight(hueState){
 		api.setLightState(12, hueState, function(err, lights){
 			if(err) throw err;
 		});
+	} else if(!hueState._values.on)  {
+		api.setLightState(12, hueState, function(err, lights){
+			if(err) throw err;
+		});
 	}
 
+}
 
+function hallLightoff(){
+	hueState = lightState.create().off();
+	api.setLightState(12, hueState, function(err, lights){
+		if(err) throw err;
+	});
 }
 
 function setLightTwo(hueState){
