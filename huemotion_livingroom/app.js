@@ -75,7 +75,10 @@ router.get('/chess', function(req,res){
 	console.log("updating hue timer via extend 60"+new Date());
 	curTime = new Date();
 	lightsOffTime = new Date(curTime.getTime() + 60*60*1000);	
-	lightsOffTimeTwo = new Date(curTime.getTime() + 60*60*1000);		
+	lightsOffTimeTwo = new Date(curTime.getTime() + 60*60*1000);	
+	hueState = lightState.create().brightness(100).rgb(255,255,255).on();
+	setLight(hueState);
+	setLightTwo(hueState);
     res.send({"Play Some Chess":"Mate"});        
 });
 
@@ -253,12 +256,11 @@ var dimLightsInEveningTwenty= new CronJob('00 45 20 * * *', function() {
 	'America/Chicago'
 );
 
-var dimLightsInEveningTen= new CronJob('00 45 21 * * *', function() {
+var dimLightsInEveningTen= new CronJob('00 30 21 * * *', function() {
 		if(!chess){
 			hueState = lightState.create().brightness(20).ct(500).on();
 			setLight(hueState);
 			setLightTwo(hueState);
-			chess = false;
 		}
 	}, function () {
 	/* This function is executed when the job stops */
@@ -305,7 +307,7 @@ setInterval(function(){
 	var bright = false;
 	console.log(new Date()+" Randomizing lights");
 	
-	if(checkTimeForRandom(theTime)){
+	if(checkTimeForRandom(theTime) && !chess){
 		randomizeLights(bright);
 	}
 		
