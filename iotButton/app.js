@@ -158,6 +158,10 @@ function setLight(hueState){
 		.then()
 		.fail(displayError)
 		.done();
+	api.setLightState(14, hueState)
+		.then()
+		.fail(displayError)
+		.done();
 
 }
 
