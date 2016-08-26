@@ -10,6 +10,7 @@ var hue = require("node-hue-api");
 var CronJob = require('cron').CronJob;
 //var dashButton = require('node-dash-button');
 
+var chess = false;
 
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -41,8 +42,6 @@ var hostname = "192.168.0.103",
 api = new HueApi(hostname, username);
 
 
-
-
 sensorTwo.watch(function(err, value) {
 	curTime = new Date();
     if (value==1){
@@ -70,6 +69,20 @@ router.get('/extend', function(req,res){
     res.send({"status":"200"});        
 });
 
+
+router.get('/chess', function(req,res){
+	chess = true;
+	console.log("updating hue timer via extend 60"+new Date());
+	curTime = new Date();
+	lightsOffTime = new Date(curTime.getTime() + 60*60*1000);	
+	lightsOffTimeTwo = new Date(curTime.getTime() + 60*60*1000);	
+	hueState = lightState.create().brightness(100).rgb(255,255,255).on();
+	setLight(hueState);
+	setLightTwo(hueState);
+    res.send({"Play Some Chess":"Mate"});        
+});
+
+
 function checkIsDayTime(theTime){
 	var shouldTurnOn = false;
 	if(theTime.getHours()>=16){
@@ -90,8 +103,6 @@ function shouldTurnOnHall(theTime){
 			if(err) throw err;
 		});
 	}
-
-
 	
 	return shouldTurnOn;
 }
@@ -176,14 +187,27 @@ function setLight(hueState){
 	api.setLightState(11, hueState, function(err, lights){
 		if(err) throw err;
 	});
+	api.setLightState(14, hueState, function(err, lights){
+		if(err) throw err;
+	});
 
 	if(hueState._values.on && hallLightShouldTurnOn){
 		api.setLightState(12, hueState, function(err, lights){
 			if(err) throw err;
 		});
+	} else if(!hueState._values.on)  {
+		api.setLightState(12, hueState, function(err, lights){
+			if(err) throw err;
+		});
 	}
 
+}
 
+function hallLightoff(){
+	hueState = lightState.create().off();
+	api.setLightState(12, hueState, function(err, lights){
+		if(err) throw err;
+	});
 }
 
 function setLightTwo(hueState){
@@ -192,11 +216,12 @@ function setLightTwo(hueState){
 	});
 }
 
-
 var dimLightsInEvening= new CronJob('00 55 19 * * *', function() {
-		hueState = lightState.create().brightness(50).ct(500).on();
-		setLight(hueState);
-		setLightTwo(hueState);
+		if(!chess){	
+			hueState = lightState.create().brightness(50).ct(500).on();
+			setLight(hueState);
+			setLightTwo(hueState);
+		}
 	}, function () {
 	/* This function is executed when the job stops */
 	},
@@ -205,9 +230,11 @@ var dimLightsInEvening= new CronJob('00 55 19 * * *', function() {
 );
 
 var dimLightsInEveningThirty= new CronJob('00 30 20 * * *', function() {
-		hueState = lightState.create().brightness(30).ct(500).on();
-		setLight(hueState);
-		setLightTwo(hueState);
+		if(!chess){
+			hueState = lightState.create().brightness(30).ct(500).on();
+			setLight(hueState);
+			setLightTwo(hueState);
+		}
 	}, function () {
 	/* This function is executed when the job stops */
 	},
@@ -216,9 +243,12 @@ var dimLightsInEveningThirty= new CronJob('00 30 20 * * *', function() {
 );
 
 var dimLightsInEveningTwenty= new CronJob('00 45 20 * * *', function() {
-		hueState = lightState.create().brightness(20).ct(500).on();
-		setLight(hueState);
-		setLightTwo(hueState);
+		if(!chess){
+			hueState = lightState.create().brightness(20).ct(500).on();
+			setLight(hueState);
+			setLightTwo(hueState);
+		}
+
 	}, function () {
 	/* This function is executed when the job stops */
 	},
@@ -226,11 +256,27 @@ var dimLightsInEveningTwenty= new CronJob('00 45 20 * * *', function() {
 	'America/Chicago'
 );
 
+var dimLightsInEveningTen= new CronJob('00 30 21 * * *', function() {
+		if(!chess){
+			hueState = lightState.create().brightness(20).ct(500).on();
+			setLight(hueState);
+			setLightTwo(hueState);
+		}
+	}, function () {
+	/* This function is executed when the job stops */
+	},
+	true, /* Start the job right now */
+	'America/Chicago'
+);
 
-var dimLightsInEveningTen= new CronJob('00 45 21 * * *', function() {
+var dimLightsInEveningTen= new CronJob('00 30 22 * * *', function() {
 		hueState = lightState.create().brightness(20).ct(500).on();
 		setLight(hueState);
 		setLightTwo(hueState);
+		if(chess){
+			chess = false;			
+		}
+
 	}, function () {
 	/* This function is executed when the job stops */
 	},
@@ -251,8 +297,6 @@ function randomizeLights(bright){
 	setLightTwo(hueState);
 }
 
-
-
 setInterval(function(){
 	theTime = new Date();
 	hallLightShouldTurnOn = shouldTurnOnHall(theTime);
@@ -263,12 +307,11 @@ setInterval(function(){
 	var bright = false;
 	console.log(new Date()+" Randomizing lights");
 	
-	if(checkTimeForRandom(theTime)){
+	if(checkTimeForRandom(theTime) && !chess){
 		randomizeLights(bright);
 	}
 		
 }, 120*60*1000);
-
 
 var brightenLightsMorning= new CronJob('00 45 5 * * *', function() {
 	var bright = true;
