@@ -8,10 +8,7 @@ var sensorOne = new Gpio(14, 'in','both');
 var sensorTwo = new Gpio(21, 'in','both');
 var hue = require("node-hue-api");
 var CronJob = require('cron').CronJob;
-//var dashButton = require('node-dash-button');
-
 var chess = false;
-
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -34,7 +31,7 @@ var lightState = hue.lightState;
 var curTime;
 var theTime;
 var hallLightShouldTurnOn = true;
-var online = false;
+var motionSensorOnline = false;
 var hostname = "192.168.0.103",
     username = "22ae6b2233c8b2971a18523e9343ca3",
     api;
@@ -44,48 +41,60 @@ api = new HueApi(hostname, username);
 
 sensorTwo.watch(function(err, value) {
 	curTime = new Date();
-    if (value==1 && online){
+    if (value==1 && motionSensorOnline){
 		flipHueTwoOn();
-		updateHueTimerTwo();       	
-    } 
+		updateHueTimerTwo();
+    }
 });
 
 
 sensorOne.watch(function(err, value) {
 	curTime = new Date();
-    if (value==1 && online){
+    if (value==1 && motionSensorOnline){
 		if(checkIsDayTime(curTime)){
 			flipHueOn();
-			updateHueTimer();       	
+			updateHueTimer();
 		}
-    } 
+    }
 });
 
 router.get('/extend', function(req,res){
 	console.log("updating hue timer via extend"+new Date());
 	curTime = new Date();
-	lightsOffTime = new Date(curTime.getTime() + lightTimer*60*1000);	
-	lightsOffTimeTwo = new Date(curTime.getTime() + lightTimer*60*1000);		
-    res.send({"status":"200"});        
+	lightsOffTime = new Date(curTime.getTime() + lightTimer*60*1000);
+	lightsOffTimeTwo = new Date(curTime.getTime() + lightTimer*60*1000);
+    res.send({"status":"200"});
+});
+
+
+router.get('/motionSensorOffline', function(req,res){
+    motionSensorOnline = false;
+});
+
+router.get('/motionSensorOnline', function(req,res){
+    motionSensorOnline = true;
 });
 
 
 router.get('/friend', function(req,res){
-	
 	var timeOff = new Date();
-	timeOff.setHours(22,30,0,0); 
+	timeOff.setHours(22,30,0,0);
+    var curTime = new Date();
+    if(curTime.getHours()>=22 && curTime.getHours()<=9){
+        motionSensorOnline = false;
+    } else {
+        new CronJob(timeOff, function() {
+    		motionSensorOnline = false;
+    	}, function () {
+    	/* This function is executed when the job stops */
+    	},
+    	true, /* Start the job right now */
+    	'America/Chicago'
+    	);
+    }
 
-	new CronJob(timeOff, function() {
-		online = false; 
-	}, function () {
-	/* This function is executed when the job stops */
-	},
-	true, /* Start the job right now */
-	'America/Chicago'
-	);
 
-	res.send({"Motion sensor will stop turning lights on at 10:30pm":"Will resume 9:45am tomorrow"});        
-      
+	res.send({"Motion sensor will stop turning lights on at 10:30pm":"Will resume 9:45am tomorrow"});
 });
 
 
@@ -93,15 +102,15 @@ router.get('/chess', function(req,res){
 	chess = true;
 	console.log("updating hue timer via extend 60"+new Date());
 	curTime = new Date();
-	lightsOffTime = new Date(curTime.getTime() + 60*60*1000);	
-	lightsOffTimeTwo = new Date(curTime.getTime() + 60*60*1000);	
+	lightsOffTime = new Date(curTime.getTime() + 60*60*1000);
+	lightsOffTimeTwo = new Date(curTime.getTime() + 60*60*1000);
 	hueState = lightState.create().brightness(100).rgb(255,255,255).on();
 	setLight(hueState);
 	setLightTwo(hueState);
 	setTimeout(function(){
 		chess = false;
 	},120*60*1000);
-	res.send({"Play Some Chess":"Mate"});        
+	res.send({"Play Some Chess":"Mate"});
 });
 
 
@@ -125,7 +134,7 @@ function shouldTurnOnHall(theTime){
 			if(err) throw err;
 		});
 	}
-	
+
 	return shouldTurnOn;
 }
 
@@ -164,12 +173,12 @@ var displayResult = function(result) {
 
 function updateHueTimer(){
 	curTime = new Date();
-	lightsOffTime = new Date(curTime.getTime() + lightTimer*60*1000);		
+	lightsOffTime = new Date(curTime.getTime() + lightTimer*60*1000);
 }
 
 function updateHueTimerTwo(){
 	curTime = new Date();
-	lightsOffTimeTwo = new Date(curTime.getTime() + lightTimer*60*1000);		
+	lightsOffTimeTwo = new Date(curTime.getTime() + lightTimer*60*1000);
 }
 
 
@@ -239,7 +248,7 @@ function setLightTwo(hueState){
 }
 
 var dimLightsInEvening= new CronJob('00 55 19 * * *', function() {
-		if(!chess){	
+		if(!chess){
 			hueState = lightState.create().brightness(50).ct(500).on();
 			setLight(hueState);
 			setLightTwo(hueState);
@@ -296,7 +305,7 @@ var dimLightsInEveningTen= new CronJob('00 30 22 * * *', function() {
 		setLight(hueState);
 		setLightTwo(hueState);
 		if(chess){
-			chess = false;			
+			chess = false;
 		}
 
 	}, function () {
@@ -327,18 +336,18 @@ setInterval(function(){
 setInterval(function(){
 	theTime = new Date();
 	var bright = false;
-	
-	if(checkTimeForRandom(theTime) && !chess && online){
+
+	if(checkTimeForRandom(theTime) && !chess && motionSensorOnline){
 		console.log(new Date()+" Randomizing lights");
 
 		randomizeLights(bright);
 	}
-		
+
 }, 120*60*1000);
 
 var brightenLightsMorning= new CronJob('00 45 9 * * *', function() {
 	var bright = true;
-	online = true;
+	motionSensorOnline = true;
 	randomizeLights(bright);
 	}, function () {
 	/* This function is executed when the job stops */
@@ -346,10 +355,3 @@ var brightenLightsMorning= new CronJob('00 45 9 * * *', function() {
 	true, /* Start the job right now */
 	'America/Chicago'
 );
-
-
-    
-
-
-
-

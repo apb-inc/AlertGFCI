@@ -38,6 +38,7 @@ app.get('/color/:redColor/:greenColor/:blueColor', function(req, res){
 	var redColor = req.params.redColor;
 	var greenColor = req.params.greenColor;
 	var blueColor = req.params.blueColor;
+    res.send("OK");
 
 	hueState = lightState.create().effect("none");
 	setLight(hueState);
@@ -45,8 +46,7 @@ app.get('/color/:redColor/:greenColor/:blueColor', function(req, res){
 		setLightFromColor(redColor+","+greenColor+","+blueColor);
 	},1000)
 	extendLightTimer();
-	
-	res.send("OK");
+
 });
 
 app.get('/btnTwo', function(req,res){
@@ -61,6 +61,14 @@ app.get('/btnTwo', function(req,res){
 
 app.get('/brightness/:level', function(req, res){
 	var level = req.params.level;
+    res.send("OK");
+
+    request('http://192.168.0.111:8080/motionSensorOnline', function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            console.log(body);
+        }
+    });
+
 	if(level == 3){
 		setHueBrightness(100);
 	} else if(level==2) {
@@ -68,32 +76,19 @@ app.get('/brightness/:level', function(req, res){
 	} else {
 		setHueBrightness(30);
 	}
-	res.send("OK");
 
 });
 
 app.get('/btnThree', function(req,res){
-	console.log("btn three");
-	var sonosUrl = 'http://192.168.0.100:5005/living room/';
-	request(sonosUrl+'favorite/pretty lights radio', function (error, response, body){
-	    if (!error && response.statusCode == 200) {
-	        console.log(body)
-	        request(sonosUrl+'playpause', function (error, response, body){
-	            if (!error && response.statusCode == 200) {
-	                console.log("Success"+ new Date());
-	            } else {
-					console.log("error");
-	            }
-	        });
-	    } else {
-	        console.log("error");
-	    }
-	});	
-	
+    res.send("OK");
+    hueState = lightState.create().off();
+	setLight(hueState);
+    request('http://192.168.0.111:8080/motionSensorOffline', function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            console.log(body);
+        }
+    });
 });
-
-
-
 
 app.get('/waterAlert',function(req,res){
 	console.log(new Date()+ " Low fountain water Detected");
@@ -101,18 +96,17 @@ app.get('/waterAlert',function(req,res){
     var loggingInterval = setInterval(function(){
         i++;
     }, 300000);
-    
+
 	if(lowWaterSendCount<1){
 		sendWaterLowAlert();
 		lowWaterSendCount++;
 		setTimeout(function(){
 			lowWaterSendCount = 0;
-		}, 420*60*1000)
+		}, 420*60*1000);
 	}
-	
+
 	res.send("OK");
 });
-
 function setHueBrightness(brightness){
 	console.log("setting brightness");
 	hueState = lightState.create().brightness(brightness).on();
@@ -168,13 +162,13 @@ function setLight(hueState){
 function extendLightTimer(){
 	request('http://192.168.0.111:8080/extend', function (error, response, body) {
 		if (!error && response.statusCode == 200) {
-			console.log(body)
+			console.log(body);
 		}
     });
 }
 
 function sendWaterLowAlert(){
-	
+
 	request.post({
 	          url:	"http://192.168.0.100:2605/twilioSend",
 	          form: { toNumber: loginInfo.connorCell, fromNumber:loginInfo.holkaAlertNumber, message: "Fountain water is low!!", twilioLocalKey: loginInfo.twilioLocalKey }
@@ -183,5 +177,5 @@ function sendWaterLowAlert(){
 	            console.log(body);
 	        }
 	    });
-	    
+
 }
