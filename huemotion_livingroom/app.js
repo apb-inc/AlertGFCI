@@ -34,7 +34,7 @@ var lightState = hue.lightState;
 var curTime;
 var theTime;
 var hallLightShouldTurnOn = true;
-
+var online = false;
 var hostname = "192.168.0.103",
     username = "22ae6b2233c8b2971a18523e9343ca3",
     api;
@@ -44,7 +44,7 @@ api = new HueApi(hostname, username);
 
 sensorTwo.watch(function(err, value) {
 	curTime = new Date();
-    if (value==1){
+    if (value==1 && online){
 		flipHueTwoOn();
 		updateHueTimerTwo();       	
     } 
@@ -53,7 +53,7 @@ sensorTwo.watch(function(err, value) {
 
 sensorOne.watch(function(err, value) {
 	curTime = new Date();
-    if (value==1){
+    if (value==1 && online){
 		if(checkIsDayTime(curTime)){
 			flipHueOn();
 			updateHueTimer();       	
@@ -70,6 +70,25 @@ router.get('/extend', function(req,res){
 });
 
 
+router.get('/friend', function(req,res){
+	
+	var timeOff = new Date();
+	timeOff.setHours(22,30,0,0); 
+
+	new CronJob(timeOff, function() {
+		online = false; 
+	}, function () {
+	/* This function is executed when the job stops */
+	},
+	true, /* Start the job right now */
+	'America/Chicago'
+	);
+
+	res.send({"Motion sensor will stop turning lights on at 10:30pm":"Will resume 9:45am tomorrow"});        
+      
+});
+
+
 router.get('/chess', function(req,res){
 	chess = true;
 	console.log("updating hue timer via extend 60"+new Date());
@@ -79,7 +98,10 @@ router.get('/chess', function(req,res){
 	hueState = lightState.create().brightness(100).rgb(255,255,255).on();
 	setLight(hueState);
 	setLightTwo(hueState);
-    res.send({"Play Some Chess":"Mate"});        
+	setTimeout(function(){
+		chess = false;
+	},120*60*1000);
+	res.send({"Play Some Chess":"Mate"});        
 });
 
 
@@ -112,7 +134,7 @@ function checkTimeForRandom(theTime){
 	var shouldTurnOn = false;
 	if(theTime.getHours()>=15 && theTime.getHours()<=19){
 		shouldTurnOn = true;
-	} else if(theTime.getHours()<8 && theTime.getHours()>=6){
+	} else if(theTime.getHours()<8 && theTime.getHours()>=7){
 		shouldTurnOn = true;
 	}
 	return shouldTurnOn;
@@ -305,16 +327,18 @@ setInterval(function(){
 setInterval(function(){
 	theTime = new Date();
 	var bright = false;
-	console.log(new Date()+" Randomizing lights");
 	
-	if(checkTimeForRandom(theTime) && !chess){
+	if(checkTimeForRandom(theTime) && !chess && online){
+		console.log(new Date()+" Randomizing lights");
+
 		randomizeLights(bright);
 	}
 		
 }, 120*60*1000);
 
-var brightenLightsMorning= new CronJob('00 45 5 * * *', function() {
+var brightenLightsMorning= new CronJob('00 45 9 * * *', function() {
 	var bright = true;
+	online = true;
 	randomizeLights(bright);
 	}, function () {
 	/* This function is executed when the job stops */
