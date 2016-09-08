@@ -47,7 +47,6 @@ sensorTwo.watch(function(err, value) {
     }
 });
 
-
 sensorOne.watch(function(err, value) {
 	curTime = new Date();
     if (value==1 && motionSensorOnline){
@@ -66,7 +65,6 @@ router.get('/extend', function(req,res){
     res.send({"status":"200"});
 });
 
-
 router.get('/motionSensorOffline', function(req,res){
     motionSensorOnline = false;
 });
@@ -74,7 +72,6 @@ router.get('/motionSensorOffline', function(req,res){
 router.get('/motionSensorOnline', function(req,res){
     motionSensorOnline = true;
 });
-
 
 router.get('/friend', function(req,res){
 	var timeOff = new Date();
@@ -92,11 +89,8 @@ router.get('/friend', function(req,res){
     	'America/Chicago'
     	);
     }
-
-
 	res.send({"Motion sensor will stop turning lights on at 10:30pm":"Will resume 9:45am tomorrow"});
 });
-
 
 router.get('/chess', function(req,res){
 	chess = true;

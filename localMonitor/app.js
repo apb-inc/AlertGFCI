@@ -22,7 +22,7 @@ var serverInfo = require('./source/serverInfo.js');
 var intervalTime = 10;
 
 if(debug){
-	intervalTime = .1;
+	intervalTime = 0.1;
 }
 
 
@@ -114,8 +114,12 @@ function checkServiceHealth(name,ip){
     request(ip, function (error, response, body) {
         var serviceObj = serviceObjectFromName(name);
         if(error){
-            serviceObj.isOnline = false;
-            sendAlert(serviceObj,false);
+            request(ip, function (error, response, body) {
+                if(error){
+                    serviceObj.isOnline = false;
+                    sendAlert(serviceObj,false);
+                }
+            });
         } else {
             if(!serviceObj.isOnline){
                 serviceObj.isOnline = true;
