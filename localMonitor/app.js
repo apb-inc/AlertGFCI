@@ -19,11 +19,14 @@ router.get('/', function(req,res){
 var services = require('./source/servicesInfo.js');
 var loginInfo = require('./source/loginInfo.js');
 var serverInfo = require('./source/serverInfo.js');
-var intervalTime = 5;
+var intervalTime = 10;
 
 if(debug){
 	intervalTime = .1;
 }
+
+
+
 
 for (var i=0;i<services.length;i++){
     services[i].isOnline = true;
