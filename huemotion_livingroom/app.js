@@ -31,7 +31,7 @@ var lightState = hue.lightState;
 var curTime;
 var theTime;
 var hallLightShouldTurnOn = true;
-var motionSensorOnline = false;
+var motionSensorOnline = true;
 var hostname = "192.168.0.103",
     username = "22ae6b2233c8b2971a18523e9343ca3",
     api;
