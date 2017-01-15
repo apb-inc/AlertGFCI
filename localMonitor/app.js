@@ -107,7 +107,6 @@ function sendAlert(serviceObj, isOnline){
             console.log(new Date()+serviceName+" is offline!");
             serviceObj.needsToSend = false;
         }
-
 }
 
 function checkServiceHealth(name,ip){
