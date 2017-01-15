@@ -31,7 +31,7 @@ var lightState = hue.lightState;
 var curTime;
 var theTime;
 var hallLightShouldTurnOn = true;
-var motionSensorOnline = false;
+var motionSensorOnline = true;
 var hostname = "192.168.0.103",
     username = "22ae6b2233c8b2971a18523e9343ca3",
     api;
@@ -62,6 +62,7 @@ router.get('/extend', function(req,res){
 	curTime = new Date();
 	lightsOffTime = new Date(curTime.getTime() + lightTimer*60*1000);
 	lightsOffTimeTwo = new Date(curTime.getTime() + lightTimer*60*1000);
+    motionSensorOnline = true;
     res.send({"status":"200"});
 });
 
@@ -92,25 +93,40 @@ router.get('/friend', function(req,res){
 	res.send({"Motion sensor will stop turning lights on at 10:30pm":"Will resume 9:45am tomorrow"});
 });
 
-router.get('/chess', function(req,res){
-	chess = true;
-	console.log("updating hue timer via extend 60"+new Date());
-	curTime = new Date();
-	lightsOffTime = new Date(curTime.getTime() + 60*60*1000);
-	lightsOffTimeTwo = new Date(curTime.getTime() + 60*60*1000);
-	hueState = lightState.create().brightness(100).rgb(255,255,255).on();
-	setLight(hueState);
-	setLightTwo(hueState);
-	setTimeout(function(){
-		chess = false;
-	},120*60*1000);
+router.get('/playchess', function(req,res){
+	console.log("updating hue timer via chess route"+new Date());
+	theTime = new Date();
+
+	if(theTime.getHours()>=9 && theTime.getHours()<=22){
+		console.log("Valid time for chess playing"+new Date());
+		chess = true;
+		curTime = new Date();
+		lightsOffTime = new Date(curTime.getTime() + 120*60*1000);
+		lightsOffTimeTwo = new Date(curTime.getTime() + 120*60*1000);
+		hueState = lightState.create().brightness(100).rgb(255,255,255).on();
+		setLight(hueState);
+		setLightTwo(hueState);
+		setTimeout(function(){
+			chess = false;
+			theTime = new Date();
+
+			if(theTime.getHours()>=22 && theTime.getHours()<=4){
+				console.log("chess ended between 10pm and 4am"+new Date());
+				hueState = lightState.create().brightness(20).ct(500).on();
+				setLight(hueState);
+				setLightTwo(hueState);
+			}
+		},120*60*1000);
+	} else {
+		console.log("Non valid time for chess playing"+new Date());
+	}
 	res.send({"Play Some Chess":"Mate"});
 });
 
 
 function checkIsDayTime(theTime){
 	var shouldTurnOn = false;
-	if(theTime.getHours()>=16){
+	if(theTime.getHours()>=15){
 		shouldTurnOn = true;
 	} else if(theTime.getHours()<8){
 		shouldTurnOn = true;
@@ -281,7 +297,7 @@ var dimLightsInEveningTwenty= new CronJob('00 45 20 * * *', function() {
 	'America/Chicago'
 );
 
-var dimLightsInEveningTen= new CronJob('00 30 21 * * *', function() {
+var dimLightsInEveningNine= new CronJob('00 30 21 * * *', function() {
 		if(!chess){
 			hueState = lightState.create().brightness(20).ct(500).on();
 			setLight(hueState);
