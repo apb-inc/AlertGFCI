@@ -13,7 +13,9 @@ var router = express.Router();
 // Route settings
 app.use('/', router);
 app.listen(port);
-console.log('Magic happens on port ' + port +" - "+ new Date());
+var currentTimeo = new Date();
+currentTimeo = new Date(currentTimeo.getTime()-60*60*1000);
+console.log('Magic happens on port ' + port +" - "+ currentTimeo);
 
 var healthCheckMins = 30;
 var needToSend = true;
@@ -22,22 +24,19 @@ var logOnline = false;
 setInterval(function(){
     //This will check if the pi is online every x number of minutes
     checkPiHealth();
-},5000);
+},5*60*1000);
 
 function sendEmail(type){
-    var currentTime = new Date();
-    var emailContent;
 
+    var currentTime = new Date();
+	currentTime = new Date(currentTime.getTime()-60*60*1000);
+	var emailContent;
 
     if(type == "online"){
-        emailContent = "The Holka server is back online "+currentTime;
-
+        emailContent = currentTime+"The Holka internet is back online ";
     } else if(type == "offline") {
-        emailContent = "The Holka server has went offline! "+currentTime;
+        emailContent = currentTime+"The Holka internet has went offline! ";
     }
-
-
-
 
     var transporter = nodemailer.createTransport({
         service: 'Gmail',
@@ -61,16 +60,12 @@ function sendEmail(type){
     });
 }
 
-
-
 function sendAlert(){
-
     if(needToSend){
-        console.log("Holka server has went offline at: "+ new Date());
+        console.log("Holka internet has went offline at: "+ new Date());
         sendEmail("offline");
         needToSend = false;
     }
-
 }
 
 function checkPiHealth(){

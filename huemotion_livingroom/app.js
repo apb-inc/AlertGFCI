@@ -4,7 +4,8 @@ var bodyParser = require('body-parser');
 var nodemailer = require('nodemailer');
 var request = require('request');
 var Gpio = require('onoff').Gpio;
-var sensor = new Gpio(14, 'in','both');
+var sensorOne = new Gpio(14, 'in','both');
+var sensorTwo = new Gpio(21, 'in','both');
 var hue = require("node-hue-api");
 var CronJob = require('cron').CronJob;
 //var dashButton = require('node-dash-button');
@@ -24,7 +25,8 @@ app.listen(port);
 console.log('Magic happens on port ' + port +" - "+ new Date());
 
 var lightsOffTime = new Date();
-var lightTimer = 60;
+var lightsOffTimeTwo = new Date();
+var lightTimer = 30;
 
 var HueApi = hue.HueApi;
 var lightState = hue.lightState;
@@ -36,59 +38,86 @@ var hostname = "192.168.0.103",
 
 api = new HueApi(hostname, username);
 
-sensor.watch(function(err, value) {
+
+
+sensorTwo.watch(function(err, value) {
+	curTime = new Date();
     if (value==1){
-	console.log("flip on motion - "+new Date());
-	flipHueOn();
-        updateHueTimer();       
+		console.log("Two: motion detected- "+curTime);
+		flipHueTwoOn();
+		updateHueTimerTwo();       	
     } 
 });
 
+
+sensorOne.watch(function(err, value) {
+	curTime = new Date();
+	
+    if (value==1){
+		console.log("One: motion detected - "+curTime);
+		if(checkTime(curTime)){
+			flipHueOn();
+			updateHueTimer();       	
+		}
+    } 
+});
+
+router.get('/extend', function(req,res){
+	console.log("updating hue timer via extend"+new Date());
+	curTime = new Date();
+	lightsOffTime = new Date(curTime.getTime() + lightTimer*60*1000);		
+    res.send({"status":"200"});        
+});
+
+function checkTime(theTime){
+	var shouldTurnOn = false;
+	if(theTime.getHours()>=16){
+		shouldTurnOn = true;
+	} else if(theTime.getHours()<8){
+		shouldTurnOn = true;
+	}
+	return shouldTurnOn;
+	
+}
+
 setInterval(function(){
 	curTime = new Date();
+	console.log("One: Cur time"+ curTime + "lights off two time"+lightsOffTime);
 	if(curTime > lightsOffTime){
 		flipHueOff();
+		console.log("One: flipping hue off" + new Date());
 	}
+}, 8*60*1000);
 
+setInterval(function(){
+	curTime = new Date();
+	console.log("Two: Cur time"+ curTime + "lights off two time"+lightsOffTimeTwo);
+	console.log("Lights off time"+lightsOffTimeTwo);
+	if(curTime > lightsOffTimeTwo){
+		flipHueTwoOff();
+		console.log("Two: flipping hue off" + new Date());
+	}
 }, 5*60*1000);
 
 
-var job = new CronJob({
-	cronTime: '00 10 23 * * 0-6',
-	onTick: function() {
-		console.log("cron - " + new Date());
-		flipHueOff();
-	},
-	start: false,
-	timeZone: 'America/Chicago'
-});
-job.start();
-
-
-var jobTwo = new CronJob({
-	cronTime: '00 10 12 * * 0-6',
-	onTick: function() {
-		console.log("cron - " + new Date());
-		flipHueOff();
-	},
-	start: false,
-	timeZone: 'America/Chicago'
-});
-jobTwo.start();
-
-
-router.get('/', function(req,res){
-    updateHueTimer();       
-    res.send({"status":"200"});        
-});
 
 var displayResult = function(result) {
     console.log(JSON.stringify(result, null, 2));
 };
 
+api.lights()
+    .then(displayResult)
+    .done();
+
+
 function updateHueTimer(){
-	var curTime = new Date();
+	curTime = new Date();
 	lightsOffTime = new Date(curTime.getTime() + lightTimer*60*1000);		
+}
+
+function updateHueTimerTwo(){
+	curTime = new Date();
+	lightsOffTimeTwo = new Date(curTime.getTime() + lightTimer*60*1000);		
 }
 
 
@@ -102,19 +131,40 @@ function flipHueOff(){
 	setLight(hueState);
 }
 
+
+function flipHueTwoOn(){
+	hueState = lightState.create().on();
+	setLightTwo(hueState);
+}
+
+function flipHueTwoOff(){
+	hueState = lightState.create().off();
+	setLightTwo(hueState);
+}
+
+
 function setLight(hueState){
-    api.setLightState(5, hueState)
-        .then()
-        .done();
-    api.setLightState(6, hueState)
-        .then()
-        .done();
-    api.setLightState(7, hueState)
-        .then()
-        .done();  
-    api.setLightState(9, hueState)
-        .then()
-        .done();  
+	api.setLightState(5, hueState, function(err, lights) {
+	    if (err) throw err;
+	});
+	api.setLightState(6, hueState, function(err, lights) {
+	    if (err) throw err;
+	});
+	api.setLightState(9, hueState, function(err, lights) {
+	    if (err) throw err;
+	});
+	api.setLightState(11, hueState, function(err, lights){
+		if(err) throw err;
+	});
+	api.setLightState(12, hueState, function(err, lights){
+		if(err) throw err;
+	});
+}
+
+function setLightTwo(hueState){
+	api.setLightState(7, hueState, function(err, lights) {
+	    if (err) throw err;
+	});
 }
 
 
