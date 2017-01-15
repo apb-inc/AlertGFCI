@@ -56,6 +56,15 @@ dash_lr_bright.on("detected", function(){
 });
 
 var countOne=0;
+
+app.get('/color', function(req,res){
+	if (countOne>9){
+		countOne = 0;
+	}
+    setColor(countOne,"dash_lr");
+    countOne++;
+});
+
 dash_lr.on("detected", function (){
 	if (countOne>9){
 		countOne = 0;
@@ -83,7 +92,7 @@ function setHueBrightness(brightness){
 function setColor(count,dashBtn){
 	switch(count) {
 	    case 0:
-			setLightFromColor("152,0,0",dashBtn);
+			setLightFromColor("0,255,0",dashBtn);
 	        break;
 	    case 1:
 			setLightFromColor("255,0,0",dashBtn);
@@ -172,3 +181,4 @@ function setLight(hueState, isDash_lr){
     }
 
 }
+

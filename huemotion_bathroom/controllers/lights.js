@@ -35,6 +35,10 @@ function setHueBrightness(brightness, allLights){
 	set(hueState,allLights);
 }
 
+function setHueColorTemp(temp, allLights){
+	hueState = lightState.create().ct(500);
+	set(hueState,allLights);
+}
 
 
 function flipHueOn(allLightsOn){
@@ -67,6 +71,39 @@ function setLampState(hueState){
 }
 
 
+
+function turnBedroomLampOff(){
+	hueState = lightState.create().off();
+	setBedroomLampState(hueState);
+}
+
+function setBedroomLampState(hueState){
+	api.setLightState(4, hueState)
+	    .then()
+	    .fail(displayError)
+	    .done();
+}
+
+function bathroomLights(on){
+	if(on){
+		hueState = lightState.create().on();
+	} else {
+		hueState = lightState.create().off();
+	}
+	twoBathroomLights(hueState);
+}
+
+function twoBathroomLights(hueState){
+	api.setLightState(1, hueState)
+	    .then()
+	    .fail(displayError)
+	    .done();
+	api.setLightState(2, hueState)
+	    .then()
+	    .fail(displayError)
+	    .done();
+}
+
 function set(hueState,allLightsOn){
     api.setLightState(1, hueState)
         .then()
@@ -88,9 +125,9 @@ function set(hueState,allLightsOn){
 		    .then()
 			.fail(displayError)
 		    .done();            
-    }
-        
+    }     
 };
+
 
 module.exports.set = set;
 module.exports.flipHueOff = flipHueOff;
@@ -100,3 +137,7 @@ module.exports.turnLampOff = turnLampOff;
 module.exports.setHueBrightness = setHueBrightness;
 module.exports.turnLampOn = turnLampOn;
 module.exports.turnLampOff = turnLampOff;
+module.exports.setHueColorTemp = setHueColorTemp;
+module.exports.turnBedroomLampOff = turnBedroomLampOff;
+module.exports.bathroomLights = bathroomLights;
+
