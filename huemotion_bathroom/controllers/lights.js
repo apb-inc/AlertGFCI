@@ -19,7 +19,7 @@ var displayResult = function(result) {
 
 function setLightFromColor(color){
 	var rgb;
-	var allLightsOn = true
+	var allLightsOn = true;
     rgb = color.split(",");
     console.log(rgb);
     var r=parseInt(rgb[0],10);
@@ -44,12 +44,12 @@ function setHueColorTemp(temp, allLights){
 function flipHueOn(allLightsOn){
 	hueState = lightState.create().on();
 	set(hueState,allLightsOn);
-};
+}
 
 function flipHueOff(){
 	hueState = lightState.create().off();
 	set(hueState,true);
-};
+}
 
 function turnLampOn(){
 	hueState = lightState.create().on();
@@ -66,14 +66,15 @@ function setLampState(hueState){
 		api.setLightState(10, hueState)
 		    .then(displayResult)
 		    .fail(displayError)
-		    .done();	
-	}, .2*60*1000)
+		    .done();
+	}, 0.2*60*1000);
 }
 
 
 
 function turnBedroomLampOff(){
 	hueState = lightState.create().off();
+    turnLampOff();
 	setBedroomLampState(hueState);
 }
 
@@ -109,24 +110,24 @@ function set(hueState,allLightsOn){
         .then()
         .fail(displayError)
         .done();
-    
+
     api.setLightState(2, hueState)
         .then()
 		.fail(displayError)
         .done();
-        
+
     api.setLightState(3, hueState)
         .then()
         .fail(displayError)
-        .done();    
-        
+        .done();
+
     if(allLightsOn){
 		api.setLightState(8, hueState)
 		    .then()
 			.fail(displayError)
-		    .done();            
-    }     
-};
+		    .done();
+    }
+}
 
 
 module.exports.set = set;
@@ -140,4 +141,3 @@ module.exports.turnLampOff = turnLampOff;
 module.exports.setHueColorTemp = setHueColorTemp;
 module.exports.turnBedroomLampOff = turnBedroomLampOff;
 module.exports.bathroomLights = bathroomLights;
-
