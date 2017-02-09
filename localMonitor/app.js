@@ -159,31 +159,17 @@ function retryRequest(name, ip, cb ){
     });
 }
 
-retryRequest(name,ip, function(err, name, ip){
-    var serviceObj = serviceObjectFromName(name);
-    serviceObj.isOnline = false;
-    sendAlert(serviceObj,serviceObj.isOnline);
 
-});
 
 
 
 
 function checkServiceHealth(name,ip){
-    request(ip, function (error, response, body) {
-        var serviceObj = serviceObjectFromName(name);
-        if(error){
-            request(ip, function (error, response, body) {
-                if(error){
-                    serviceObj.isOnline = false;
-                    sendAlert(serviceObj,serviceObj.isOnline);
-                }
-            });
-        } else {
-            if(!serviceObj.isOnline){
-                serviceObj.isOnline = true;
-                sendAlert(serviceObj,serviceObj.isOnline);
-            }
+    retryRequest(name,ip, function(err, name, ip){
+        if(!err){
+            var serviceObj = serviceObjectFromName(name);
+            serviceObj.isOnline = false;
+            sendAlert(serviceObj,serviceObj.isOnline);
         }
     });
 }
