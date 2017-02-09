@@ -1,4 +1,4 @@
-var debug = false;
+var debug = true;
 
 var request = require('request');
 var nodemailer = require('nodemailer');
@@ -21,10 +21,10 @@ router.get('/', function(req,res){
 var services = require('./source/servicesInfo.js');
 var loginInfo = require('./source/loginInfo.js');
 var serverInfo = require('./source/serverInfo.js');
-var intervalTime = 10;
+var intervalTime = 1;
 
 if(debug){
-	intervalTime = 0.1;
+	intervalTime = 1;
 }
 
 
@@ -116,36 +116,27 @@ function retryRequest(name, ip, cb ){
         retries: 5,
         factor: 3,
         minTimeout: 1 * 1000,
-        maxTimeout: 60 * 1000,
+        maxTimeout: 30000,
         randomize: true,
     });
-
     operation.attempt(function(currentAttempt) {
-
         request(ip, function (error, response, body) {
-            var serviceObj = serviceObjectFromName(name);
             if(operation.retry(error)){
                 return;
             }
-            if(!serviceObj.isOnline){
-                serviceObj.isOnline = true;
-                sendAlert(serviceObj,serviceObj.isOnline);
-            }
-            cb(err ? operation.mainError() : null, name, ip);
+            cb(error ? operation.mainError() : null, name, ip);
         });
     });
 }
 
-
-
-
-
-
 function checkServiceHealth(name,ip){
     retryRequest(name,ip, function(err, name, ip){
-        if(!err){
-            var serviceObj = serviceObjectFromName(name);
+        var serviceObj = serviceObjectFromName(name);
+        if(err){
             serviceObj.isOnline = false;
+            sendAlert(serviceObj,serviceObj.isOnline);
+        } else if (!serviceObj.isOnline) {
+			serviceObj.isOnline = true;
             sendAlert(serviceObj,serviceObj.isOnline);
         }
     });
