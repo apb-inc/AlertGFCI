@@ -3,6 +3,8 @@ var debug = false;
 var request = require('request');
 var nodemailer = require('nodemailer');
 var express = require('express');
+var retry = require('retry');
+
 var app = express();
 
 var port = process.env.PORT || 8080;
@@ -109,6 +111,64 @@ function sendAlert(serviceObj, isOnline){
         }
 }
 
+
+// var dns = require('dns');
+// var retry = require('retry');
+//
+// function faultTolerantResolve(address, cb) {
+//   var operation = retry.operation();
+//
+//   operation.attempt(function(currentAttempt) {
+//     dns.resolve(address, function(err, addresses) {
+//       if (operation.retry(err)) {
+//         return;
+//       }
+//
+//       cb(err ? operation.mainError() : null, addresses);
+//     });
+//   });
+// }
+//
+// faultTolerantResolve('nodejs.org', function(err, addresses) {
+//   console.log(err, addresses);
+// });
+
+
+function retryRequest(name, ip, cb ){
+    var operation = retry.operation({
+        retries: 5,
+        factor: 3,
+        minTimeout: 1 * 1000,
+        maxTimeout: 60 * 1000,
+        randomize: true,
+    });
+
+    operation.attempt(function(currentAttempt) {
+
+        request(ip, function (error, response, body) {
+            var serviceObj = serviceObjectFromName(name);
+            if(operation.retry(error)){
+                return;
+            }
+            if(!serviceObj.isOnline){
+                serviceObj.isOnline = true;
+                sendAlert(serviceObj,serviceObj.isOnline);
+            }
+            cb(err ? operation.mainError() : null, name, ip);
+        });
+    });
+}
+
+retryRequest(name,ip, function(err, name, ip){
+    var serviceObj = serviceObjectFromName(name);
+    serviceObj.isOnline = false;
+    sendAlert(serviceObj,serviceObj.isOnline);
+
+});
+
+
+
+
 function checkServiceHealth(name,ip){
     request(ip, function (error, response, body) {
         var serviceObj = serviceObjectFromName(name);
@@ -116,7 +176,7 @@ function checkServiceHealth(name,ip){
             request(ip, function (error, response, body) {
                 if(error){
                     serviceObj.isOnline = false;
-                    sendAlert(serviceObj,false);
+                    sendAlert(serviceObj,serviceObj.isOnline);
                 }
             });
         } else {
