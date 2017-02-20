@@ -10,7 +10,8 @@ var curTime;
 
 
 var lights = require('./lights.js');
-
+var bathroomTimeoutMins = 25;
+var floatRoomTimeoutMins = 60;
 
 
 exports.start = function(){
@@ -21,7 +22,7 @@ exports.start = function(){
 		    console.log("-----------------------------------------------------------------");
 			console.log("Flip on from bathroom sensor"+new Date());
 		    lights.flipHueOn(allLightsOn);
-	        updateHueTimer(20);
+	        updateHueTimer(bathroomTimeoutMins);
 	    }
 	});
 
@@ -31,7 +32,7 @@ exports.start = function(){
 		    console.log("-----------------------------------------------------------------");
 			console.log("Flip on from float room sensor"+new Date());
 		    lights.flipHueOn(allLightsOn);
-	        updateHueTimer(5);
+	        updateHueTimer(floatRoomTimeoutMins);
 	    }
 	});
 
@@ -45,12 +46,13 @@ exports.start = function(){
 	}, 1*60*1000);	
 	
 
-	var dimLightsAtNight = new CronJob('00 00 20 * * *', function() {
+	var dimLightsAtNight = new CronJob('00 45 7 * * *', function() {
 
 			var allLights = false;
 			lights.setHueBrightness(5,allLights);
 			lights.setHueColorTemp(500,allLights);
 			lights.bathroomLights(false);
+			lights.turnBedroomLampsOn();
 
 		}, function () {
 		/* This function is executed when the job stops */

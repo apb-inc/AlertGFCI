@@ -72,6 +72,13 @@ function setLampState(hueState){
 
 
 
+function turnBedroomLampsOn(){
+	hueState = lightState.create().on();
+    turnLampOn();
+	setBedroomLampState(hueState);
+}
+
+
 function turnBedroomLampOff(){
 	hueState = lightState.create().off();
     turnLampOff();
@@ -141,3 +148,4 @@ module.exports.turnLampOff = turnLampOff;
 module.exports.setHueColorTemp = setHueColorTemp;
 module.exports.turnBedroomLampOff = turnBedroomLampOff;
 module.exports.bathroomLights = bathroomLights;
+module.exports.turnBedroomLampsOn = turnBedroomLampsOn;
