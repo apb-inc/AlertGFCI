@@ -37,7 +37,7 @@ var hostname = "192.168.0.103",
     api;
 
 api = new HueApi(hostname, username);
-
+var chessTimeout = null;
 
 sensorTwo.watch(function(err, value) {
 	curTime = new Date();
@@ -94,10 +94,17 @@ router.get('/friend', function(req,res){
 });
 
 router.get('/playchess', function(req,res){
+	
+	res.render('index.ejs');
+
+});
+
+router.get('/chesss', function(req,res){
+
 	console.log("updating hue timer via chess route"+new Date());
 	theTime = new Date();
 
-	if(theTime.getHours()>=9 && theTime.getHours()<=22){
+	if(theTime.getHours()>=9 && theTime.getHours()<=23){
 		console.log("Valid time for chess playing"+new Date());
 		chess = true;
 		curTime = new Date();
@@ -106,10 +113,16 @@ router.get('/playchess', function(req,res){
 		hueState = lightState.create().brightness(100).rgb(255,255,255).on();
 		setLight(hueState);
 		setLightTwo(hueState);
-		setTimeout(function(){
+		clearTimeout(chessTimeout);
+		var i = 0;
+		var logging = setInterval(function(){
+			i++;
+		}, 300000)
+		chessTimeout = setTimeout(function(){
+			clearInterval(logging);
 			chess = false;
 			theTime = new Date();
-
+			console.log("chess is over"+ new Date());
 			if(theTime.getHours()>=22 && theTime.getHours()<=4){
 				console.log("chess ended between 10pm and 4am"+new Date());
 				hueState = lightState.create().brightness(20).ct(500).on();
@@ -117,10 +130,11 @@ router.get('/playchess', function(req,res){
 				setLightTwo(hueState);
 			}
 		},120*60*1000);
+		res.send({"Play Some Chess":"Mate"});
 	} else {
+		res.send({"It's too late to play chess":"Mate"});
 		console.log("Non valid time for chess playing"+new Date());
 	}
-	res.send({"Play Some Chess":"Mate"});
 });
 
 
@@ -316,6 +330,7 @@ var dimLightsInEveningTen= new CronJob('00 30 22 * * *', function() {
 		setLightTwo(hueState);
 		if(chess){
 			chess = false;
+			console.log("dimming lights in evening chess was enabled", new Date());
 		}
 
 	}, function () {
@@ -324,6 +339,25 @@ var dimLightsInEveningTen= new CronJob('00 30 22 * * *', function() {
 	true, /* Start the job right now */
 	'America/Chicago'
 );
+
+
+var lightsOffMidnight= new CronJob('00 59 23 * * *', function() {
+		if(chess){
+			flipHueOff();
+			lightsOffTime = new Date();
+			lightsOffTimeTwo = new Date();
+			console.log('flipping lights off chess enabled', new Date());
+			chess = false;
+		} else {
+			console.log('flipping lights off chess disabled', new Date());
+		}
+	}, function () {
+	/* This function is executed when the job stops */
+	},
+	true, /* Start the job right now */
+	'America/Chicago'
+);
+
 
 function randomizeLights(bright){
 	var r = Math.floor((Math.random() * 255) + 1);
