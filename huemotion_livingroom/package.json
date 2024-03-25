@@ -8,7 +8,7 @@
 		"cron": "1.1.0",
 		"dash-button": "^1.0.0",
 		"ejs": "2.5.7",
-		"express": "4.13.3",
+		"express": "4.19.2",
 		"node-dash-button": "0.2.6",
 		"node-hue-api": "2.0.1",
 		"nodemailer": "1.10.0",
